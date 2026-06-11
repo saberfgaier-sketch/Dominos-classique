@@ -1,1704 +1,1885 @@
 <!DOCTYPE html>
-<html lang="fr" class="h-full">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Droppex Arena - Tournoi International de Dominos</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;850;900&family=JetBrains+Mono:wght@400;500;700;800&family=Space+Grotesk:wght@500;700;900&display=swap" rel="stylesheet">
-  
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-            display: ['Space Grotesk', 'sans-serif'],
+<html lang="fr" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Droppex Dominoes — Tournoi de l'Arène</title>
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'system-ui', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            }
           }
         }
       }
-    }
-  </script>
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;550;600;700;900&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+    
+    <!-- React and ReactDOM CDNs -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <!-- Babel standalone for runtime JSX compilation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <style>
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: rgba(4, 47, 46, 0.3);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(45, 212, 191, 0.4);
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(45, 212, 191, 0.6);
-    }
-
-    body {
-      background-color: #061512;
-      background-image: 
-        radial-gradient(circle at 10% 20%, rgba(4, 47, 46, 0.6) 0%, transparent 45%),
-        radial-gradient(circle at 90% 80%, rgba(17, 94, 89, 0.4) 0%, transparent 45%);
-      background-attachment: fixed;
-    }
-
-    /* Glass Panels */
-    .immersive-panel {
-      background: rgba(6, 29, 26, 0.82);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(45, 212, 191, 0.18);
-      box-shadow: 
-        0 10px 30px -10px rgba(0, 0, 0, 0.7),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    }
-
-    .immersive-panel-dark {
-      background: rgba(3, 15, 13, 0.9);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(45, 212, 191, 0.1);
-      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
-    }
-
-    /* Domino styling */
-    .domino-pips {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(3, 1fr);
-      width: 100%;
-      height: 100%;
-      padding: 3px;
-    }
-
-    /* Animations */
-    @keyframes pulse-soft {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.85; transform: scale(0.98); }
-    }
-    .animate-pulse-soft {
-      animation: pulse-soft 3s infinite ease-in-out;
-    }
-
-    @keyframes scaleUp {
-      from { transform: scale(0.92); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-    .animate-scale-up {
-      animation: scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    .animate-fade-in {
-      animation: fadeIn 0.25s ease-out forwards;
-    }
-
-    /* Custom button shimmer */
-    .immersive-btn-teal {
-      background: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 100%);
-      color: #031e1b;
-      box-shadow: 
-        0 4px 14px rgba(45, 212, 191, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
-      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .immersive-btn-teal:hover {
-      background: linear-gradient(135deg, #5eead4 0%, #2dd4bf 100%);
-      box-shadow: 
-        0 6px 20px rgba(45, 212, 191, 0.6),
-        inset 0 1px 0 rgba(255, 255, 255, 0.4);
-      transform: translateY(-1px);
-    }
-    .immersive-btn-teal:active {
-      transform: translateY(1px);
-      box-shadow: 0 2px 6px rgba(45, 212, 191, 0.3);
-    }
-  </style>
-</head>
-<body class="font-sans text-slate-100 flex flex-col min-h-screen selection:bg-teal-500 selection:text-teal-950">
-
-  <!-- Header Banner -->
-  <header class="w-full border-b border-teal-900/40 bg-teal-950/20 backdrop-blur-md px-3 py-3 sm:px-6 relative z-10 shrink-0">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-500 to-[#2dd4bf] flex items-center justify-center font-black text-[#042f2e] text-2xl shadow-lg ring-2 ring-teal-400/20">
-          🂾
-        </div>
-        <div>
-          <h1 class="text-lg sm:text-xl font-black tracking-tight text-[#2dd4bf] drop-shadow flex items-center gap-2 font-display">
-            Droppex Dominoes <span class="text-[10px] bg-teal-950/60 text-teal-300 font-bold px-2 py-0.5 rounded-full border border-teal-400/20 tracking-wider">CHAMPIONNAT</span>
-          </h1>
-          <p class="text-xs text-teal-200/50 font-medium font-mono">Défiez les champions du monde de l'arène</p>
-        </div>
-      </div>
-      
-      <!-- Utility control and sound trigger buttons -->
-      <div class="flex items-center gap-2.5">
-        <button id="soundToggle" class="p-2 rounded-xl bg-black/40 border border-white/5 hover:bg-black/60 hover:text-white transition-all text-teal-300 text-xs flex items-center gap-1.5 focus:outline-none" title="Activer/Désactiver le son snythétisé">
-          <span id="soundIcon">🔊</span> <span class="font-bold font-mono">SONS</span>
-        </button>
-        <button id="btnRestartMatch" class="px-3 py-2 rounded-xl bg-teal-950/50 border border-[#2dd4bf]/30 hover:bg-[#2dd4bf]/10 text-[#2dd4bf] font-black text-xs transition-all uppercase tracking-wider flex items-center gap-1.5">
-          <span>🔄 Réinitialiser</span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Tournament Scoreboard Header Banner -->
-  <div class="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 mt-3 relative z-10 shrink-0">
-    <div class="immersive-panel rounded-2xl p-3 sm:p-4 bg-gradient-to-r from-teal-950/70 via-[#0a2e2c]/90 to-teal-950/70 border border-[#2dd4bf]/20 shadow-md flex flex-col md:flex-row justify-between items-center gap-3">
-      <!-- Active Opponent Info -->
-      <div class="flex items-center gap-3">
-        <span id="oppFlag" class="text-3xl sm:text-4xl filter drop-shadow">🇧🇷</span>
-        <div>
-          <div class="flex items-center gap-1.5">
-            <span class="text-[9px] font-black text-teal-300 tracking-wider uppercase bg-teal-950/60 px-2 py-0.5 rounded border border-teal-400/20 leading-none">FACE À :</span>
-            <span id="oppDesc" class="text-[11px] text-teal-200/60 font-medium italic">Danseur de samba au jeu très tactique 🕺</span>
-          </div>
-          <h2 class="text-base sm:text-lg font-black text-slate-100 flex items-center gap-2 leading-tight mt-1">
-            <span id="oppName">Carlos</span> <span class="text-teal-450 font-mono text-xs">(<span id="oppCountry">Brésil</span>)</span>
-          </h2>
-        </div>
-      </div>
-
-      <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-6 w-full md:w-auto">
-        <!-- Rounds Counter -->
-        <div class="text-center bg-black/30 border border-white/5 px-3 py-1.5 rounded-xl shrink-0">
-          <p class="text-[9px] font-bold text-teal-300/50 uppercase leading-none pb-0.5">MANCHE</p>
-          <p class="text-xs font-mono font-black text-[#2dd4bf]"><span id="roundCounter">ROUND 1</span> <span class="text-[9px] text-teal-400 font-normal">/ 12</span></p>
-        </div>
-
-        <!-- Core Score Matchboard -->
-        <div class="flex items-center gap-3.5 bg-black/45 px-4 py-2 rounded-2xl border-2 border-[#2dd4bf]/25 shadow-inner relative overflow-hidden shrink-0">
-          <!-- Score bar player -->
-          <div class="flex flex-col items-center">
-            <p class="text-[9px] font-bold text-[#2dd4bf]/80 uppercase leading-none pb-0.5">Vous</p>
-            <p class="text-xl font-mono font-black text-[#2dd4bf]">
-              <span id="scorePlayer">0</span> <span class="text-[10px] text-[#2dd4bf]/70 font-normal">pts</span>
-            </p>
-          </div>
-
-          <!-- VS Divider badge -->
-          <div class="text-center flex flex-col items-center mx-1 select-none">
-            <span class="bg-[#211]/30 text-rose-500 border border-rose-500/30 text-[9px] font-black px-1.5 rounded-md leading-normal select-none">VS</span>
-            <span class="text-[8px] font-semibold text-slate-400 mt-0.5 leading-none">Cible: 100</span>
-          </div>
-
-          <!-- Score bar opponent -->
-          <div class="flex flex-col items-center">
-            <p id="oppScoreLabel" class="text-[9px] font-bold text-rose-300 uppercase leading-none pb-0.5">Carlos</p>
-            <p class="text-xl font-mono font-black text-rose-400" id="opponentScoreWrapper">
-              <span id="scoreComputer">0</span> <span class="text-[10px] text-rose-500/70 font-normal">pts</span>
-            </p>
-          </div>
-        </div>
-
-        <!-- Relative progress bar tracker helper -->
-        <div class="hidden lg:flex flex-col gap-1 w-32 justify-center">
-          <div class="flex justify-between text-[8px] font-bold text-slate-400 leading-none font-mono">
-            <span>Vous: <span id="pctPlayer">0</span>%</span>
-            <span>Rival: <span id="pctComputer">0</span>%</span>
-          </div>
-          <div class="w-full h-1.5 rounded bg-black/40 overflow-hidden border border-white/5 flex">
-            <div id="progPlayer" style="width: 0%" class="h-full bg-gradient-to-r from-teal-500 to-[#2dd4bf] transition-all duration-500" />
-            <div id="progComputer" style="width: 0%" class="h-full bg-gradient-to-r from-rose-500 to-rose-400 transition-all duration-500 ml-auto" />
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main Container Layout -->
-  <main class="flex-1 w-full max-w-7xl mx-auto p-2 sm:p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-4 gap-3.5 sm:gap-6 relative z-10 overflow-hidden">
-    <!-- Playable Sand Board (Center column taking 3/4 widths) -->
-    <div class="lg:col-span-3 flex flex-col gap-3.5 sm:gap-5 h-full overflow-hidden">
-      
-      <!-- Opponent IA Box -->
-      <div class="immersive-panel rounded-3xl p-3 sm:p-4 relative overflow-hidden shadow-xl shrink-0">
-        <div class="absolute top-2 right-2 flex items-center gap-1.5 bg-rose-500/10 border border-rose-500/30 px-2.5 py-0.5 sm:py-1 rounded-full text-rose-400 text-[10px] sm:text-xs font-bold font-mono">
-          <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse relative block" id="oppStatusRing"></span>
-          <span>OPPOSANT DE L'MANCHE</span>
-        </div>
- 
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-teal-950 border-2 border-[#2dd4bf]/40 flex items-center justify-center font-black text-slate-100 text-xl sm:text-2xl shadow-inner relative shrink-0">
-            <span id="oppFace">🇧🇷</span>
-          </div>
- 
-          <div>
-            <h3 class="font-black text-slate-50 text-sm sm:text-base flex items-center gap-2 leading-tight font-display">
-              <span id="oppLabelName">Carlos</span>
-              <span class="bg-black/30 text-[#2dd4bf] font-mono text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-bold">
-                <span id="oppTilesNum">7</span> dominos
-              </span>
-            </h3>
-            <p class="text-[11px] sm:text-xs text-teal-200/60 font-medium mt-0.5 font-mono">
-              <span id="aiThinkingStatus">En attente de votre premier coup...</span>
-            </p>
-          </div>
-        </div>
- 
-        <!-- Back face domino tiles representing Computer hand -->
-        <div id="computerHandContainer" class="mt-2.5 flex -space-x-3.5 sm:-space-x-2 items-center p-2 rounded-2xl bg-black/20 border border-white/5 min-h-[55px] sm:min-h-[80px] justify-start overflow-x-auto">
-          <!-- Back tiles will be rendered dynamically here -->
-        </div>
-      </div>
- 
-      <!-- Central Felt Arena Board -->
-      <div class="flex-1 min-h-[220px] sm:min-h-[300px] bg-gradient-to-b from-[#115e59] to-[#042f2e] rounded-3xl border-4 border-[#2dd4bf]/30 shadow-[inset_0_4px_16px_rgba(0,0,0,0.6),0_12px_24px_rgba(0,0,0,0.4)] p-3 sm:p-4 flex flex-col justify-between relative overflow-hidden">
-        <!-- Visual felt grid texture lines -->
-        <div class="absolute inset-0 opacity-5 pointer-events-none bg-[radial-gradient(circle_at_center,#ffffff_1.2px,transparent_1.2px)] [background-size:24px_24px]"></div>
- 
-        <!-- Outer felt highlight border details -->
-        <div class="absolute inset-x-0 top-0 h-1 bg-teal-950/40"></div>
- 
-        <!-- Title and top indicators -->
-        <div class="w-full flex justify-between items-center z-10 px-1 gap-2 shrink-0">
-          <!-- Turn Banner Badge info -->
-          <div>
-            <div id="turnBadgePlayer" class="bg-teal-450/10 border border-[#2dd4bf]/40 text-[#2dd4bf] font-black px-3 py-1 rounded-xl text-[10px] sm:text-xs flex items-center gap-1.5 shadow-sm backdrop-blur-sm tracking-wide">
-              <span class="w-2 h-2 rounded-full bg-[#2dd4bf] animate-ping" />
-              <span>À VOTRE TOUR DE JOUER !</span>
-            </div>
-            <div id="turnBadgeComputer" class="hidden bg-amber-400/10 border border-amber-400/40 text-amber-300 font-bold px-3 py-1 rounded-xl text-[10px] sm:text-xs flex items-center gap-1.5 shadow-sm backdrop-blur-sm tracking-wide">
-              <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-              <span>RIVAL EN COURS DE RÉFLEXION...</span>
-            </div>
-          </div>
-
-          <!-- Top-right boneyard button inside board frame -->
-          <div>
-            <button id="boardTalonBtn" class="flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-mono font-bold transition-all border select-none cursor-pointer">
-              <span>🂱 Talon:</span>
-              <span id="boardTalonCount" class="font-mono bg-black/30 text-[#2dd4bf] px-1 rounded font-black">14</span>
-            </button>
-          </div>
-        </div>
- 
-        <!-- Central chain board area (Dominoes flow) -->
-        <div class="my-auto w-full relative overflow-hidden py-4 shrink-0">
-          <div id="boardChain" class="flex items-center gap-2 p-3 sm:p-5 overflow-x-auto min-h-[110px] sm:min-h-[160px] justify-start md:justify-center items-center select-none transition-all duration-300">
-            <!-- Dominos & slots will be dumped here -->
-          </div>
-        </div>
- 
-        <!-- Table bottom scroll controls and utilities -->
-        <div class="w-full flex justify-between items-center z-10 px-1 mt-auto gap-2 shrink-0">
-          <div class="flex flex-col text-left">
-            <span id="boardEndsLabel" class="text-[10px] sm:text-[11px] text-[#2dd4bf] font-bold tracking-wider uppercase font-mono leading-tight">
-              Aucun domino sur la table
-            </span>
-            <span id="lastActionLabel" class="text-[9px] font-mono text-teal-300/40 truncate max-w-[200px] sm:max-w-md hidden sm:inline-block leading-tight mt-0.5">
-              Dernière action: Initialisation de l'arène.
-            </span>
-          </div>
- 
-          <div class="flex gap-1.5 shrink-0" id="scrollButtonsContainer">
-            <button id="scrollLeftBtn" class="p-1 px-2.5 text-[10px] sm:text-xs font-semibold bg-black/40 hover:bg-black/60 border border-[#2dd4bf]/20 rounded-lg text-[#2dd4bf] flex items-center gap-0.5 select-none cursor-pointer">
-              ◀ Gauche
-            </button>
-            <button id="scrollRightBtn" class="p-1 px-2.5 text-[10px] sm:text-xs font-semibold bg-black/40 hover:bg-black/60 border border-[#2dd4bf]/20 rounded-lg text-[#2dd4bf] flex items-center gap-0.5 select-none cursor-pointer">
-              Droite ▶
-            </button>
-          </div>
-        </div>
-      </div>
- 
-      <!-- User Side Deck Player Box -->
-      <div class="immersive-panel rounded-3xl p-3 sm:p-4 relative shadow-md shrink-0">
-        <div class="absolute top-2 right-2 flex items-center gap-1 bg-teal-500/10 border border-teal-500/30 px-3 py-1 rounded-full text-[#2dd4bf] text-[10px] sm:text-xs font-bold font-mono">
-          <span class="w-1.5 h-1.5 rounded-full bg-[#2dd4bf]" id="playerRingStatus"></span>
-          <span>VOTRE JEU (JOUEUR)</span>
-        </div>
- 
-        <div class="mb-2 sm:mb-3">
-          <h3 class="font-black text-slate-50 text-sm sm:text-base flex items-center gap-2 leading-tight font-display">
-            Vos Dominoes en Main
-            <span class="bg-black/30 text-[#2dd4bf] font-mono text-xs px-2 py-0.5 rounded-full font-bold" id="playerHandCount">
-              7
-            </span>
-          </h3>
-          <p id="playerInstructions" class="text-[11px] sm:text-xs text-teal-200/50 mt-0.5 font-mono">
-            Cliquez sur un domino pour le sélectionner et le positionner sur l'un des côtés actifs.
-          </p>
-        </div>
- 
-        <!-- Displaying player hand -->
-        <div id="playerHandContainer" class="flex flex-wrap gap-2.5 p-2 sm:p-3 rounded-2xl bg-black/25 border border-white/5 min-h-[90px] sm:min-h-[125px] items-center justify-start overflow-x-auto">
-          <!-- Dynamically populated player cards -->
-        </div>
- 
-        <!-- Force Pass and Empty Draw actions notification banner -->
-        <div id="playerControlsAlert" class="hidden mt-3 items-center justify-between p-2.5 rounded-2xl bg-teal-500/10 border-2 border-[#2dd4bf]/35 text-teal-200 animate-pulse-soft">
-          <div class="flex items-center gap-2">
-            <span class="text-xl">⚠️</span>
-            <div>
-              <p class="text-[11px] sm:text-xs font-black">BLOQUÉ ! AUCUN COUP VALIDE EN MAIN</p>
-              <p id="alertDescription" class="text-[9px] sm:text-[10px] text-teal-200/60 font-medium font-mono leading-none mt-0.5">
-                La pioche contient encore des dominos, piochez un domino pour continuer.
-              </p>
-            </div>
-          </div>
-          <button id="alertActionBtn" class="immersive-btn-teal font-black px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-[10px] sm:text-xs shadow-md border-0 uppercase hover:scale-105 active:scale-95 transition-all cursor-pointer">
-            Piocher
-          </button>
-        </div>
-      </div>
-    </div>
- 
-    <!-- Sidebar Info/Status column (1/4 width) - Rendered only on large displays -->
-    <div class="hidden lg:flex flex-col gap-4 sm:gap-5 h-full overflow-hidden">
-      <!-- Boneyard Talon stack view -->
-      <div class="immersive-panel rounded-3xl p-4 flex flex-col justify-between shadow-md h-[180px] sm:h-[210px] shrink-0">
-         <div>
-           <h3 class="font-black text-slate-100 text-xs sm:text-sm tracking-wide uppercase font-display flex items-center gap-1.5 text-[#2dd4bf]">
-             <span>🂳 Le Talon</span>
-           </h3>
-           <p class="text-teal-200/50 text-[10px] sm:text-[11px] font-mono mt-1">Sert de réserve de pièces lorsqu'aucun coup n'est possible en main.</p>
-         </div>
- 
-         <div class="flex justify-center items-center py-2 h-24">
-           <div id="talonStackVisual" class="relative w-12 h-16 group select-none flex items-center justify-center cursor-pointer">
-             <!-- Stack layers -->
-             <div class="absolute inset-0 bg-teal-950 border border-[#2dd4bf]/40 rounded-lg shadow-md transform -translate-x-1 translate-y-1 rotate-2"></div>
-             <div class="absolute inset-0 bg-teal-900 border border-[#2dd4bf]/30 rounded-lg shadow-md transform translate-x-1.5 -translate-y-1 -rotate-3"></div>
-             <!-- Top actual card -->
-             <div class="absolute inset-0 bg-gradient-to-br from-teal-850 to-teal-950 rounded-lg border-2 border-[#2dd4bf] shadow-xl flex flex-col justify-between p-1.5 group-hover:-translate-y-1 transition-all">
-               <div class="w-full h-full rounded border border-teal-500/20 bg-teal-950/40 shadow-inner flex flex-col items-center justify-center p-1 relative">
-                 <div class="text-teal-300 font-mono text-center font-bold leading-none text-xs">RESERVE</div>
-                 <div class="text-[9px] text-teal-400/60 font-mono mt-1">DRAG HERE</div>
-               </div>
-               
-               <div id="talonFloatBadge" class="absolute -bottom-2 -right-2 bg-[#042f2e] text-[#2dd4bf] text-[10px] font-black w-6 h-6 rounded-full flex items-center justify-center border border-[#2dd4bf]/40 shadow-md transition-transform group-hover:scale-110">
-                 14
-               </div>
-             </div>
-           </div>
-         </div>
-      </div>
- 
-      <!-- Activity Logs Console column -->
-      <div class="immersive-panel-dark rounded-3xl p-4 flex-1 flex flex-col justify-between shadow-md min-h-[220px] overflow-hidden">
-        <div class="shrink-0">
-          <h3 class="font-black text-slate-100 text-xs sm:text-sm tracking-wide uppercase font-display text-[#2dd4bf]">
-            🧾 Journal de l'Arène
-          </h3>
-          <p class="text-[10px] text-teal-200/50 mt-0.5 font-mono">Derniers événements enregistrés :</p>
-        </div>
- 
-        <!-- Scroll view of text events -->
-        <div id="logsConsole" class="my-3 flex-1 overflow-y-auto max-h-[240px] bg-black/40 rounded-2xl p-3 border border-white/5 font-mono text-[10px] leading-relaxed select-text tracking-wide [scrollbar-width:thin]">
-          <!-- Logs will dump here -->
-        </div>
- 
-        <div class="text-[9px] text-teal-200/50 bg-teal-950/30 p-2.5 rounded-xl text-center border border-white/5 font-mono shrink-0">
-          <span class="font-bold text-[#2dd4bf]">Astuce :</span> Sélectionnez un domino pour faire apparaître les zones de placement ou piocher.
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- Sound Toggle Visual indicator -->
-  <div id="toastNotification" class="fixed bottom-4 right-4 z-50 bg-[#0f3d3a] border border-[#2dd4bf]/40 text-teal-200 rounded-xl px-4 py-2 text-xs font-mono font-bold shadow-xl opacity-0 transform translate-y-3 pointer-events-none transition-all duration-350">
-    Notification text here
-  </div>
-
-  <!-- Round Completion Dialog Transition Popup Modal -->
-  <div id="roundModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fade-in">
-    <div class="bg-[#0f3d3a] border-2 border-[#2dd4bf] rounded-3xl max-w-md w-full p-6 text-center shadow-2xl relative overflow-hidden animate-scale-up">
-      <div class="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(circle_at_center,#2dd4bf_0%,transparent_75%)]"></div>
-
-      <div class="text-xs font-black text-teal-400 tracking-wider uppercase mb-2 font-mono">
-        FIN DE MANCHE — <span id="modalRoundHeader">ROUND 1</span> / 12
-      </div>
-
-      <!-- Winner message -->
-      <div id="modalWinStatus">
-        <div class="w-14 h-14 rounded-full bg-teal-500/20 border-2 border-teal-400/60 flex items-center justify-center mb-3 mx-auto animate-bounce">
-          🏆
-        </div>
-        <h3 class="text-xl font-black text-[#2dd4bf] leading-tight font-display">
-          Manche pour vous !
-        </h3>
-        <p id="modalWinDesc" class="text-xs text-teal-100/70 mt-2 leading-relaxed font-sans">
-          Vous remportez ce round et récupérez les points restants dans la main de l'adversaire.
-        </p>
-        <div id="modalRoundPoints" class="mt-4 px-4 py-2 rounded-xl bg-teal-950/60 border border-[#2dd4bf]/20 text-sm font-mono font-black text-[#2dd4bf] inline-block">
-          Score du round : +0 points !
-        </div>
-      </div>
-
-      <!-- Hand Detail elements of current state -->
-      <div class="mt-5 p-3 rounded-xl bg-black/40 border border-white/5 grid grid-cols-2 gap-2 text-center text-xs">
-        <div class="border-r border-white/5">
-          <span class="text-[10px] text-teal-300/40 block uppercase font-mono">Vos points</span>
-          <span id="modalPlayerScoreSum" class="font-mono text-base font-black text-teal-100">12 pts</span>
-        </div>
-        <div>
-          <span class="text-[10px] text-teal-300/40 block uppercase font-mono" id="modalOppLabelPoints">Adversaire</span>
-          <span id="modalComputerScoreSum" class="font-mono text-base font-black text-teal-100">32 pts</span>
-        </div>
-      </div>
-
-      <!-- Cumulative match score preview block -->
-      <div class="mt-5 pt-4 border-t border-white/10">
-        <p class="text-[10px] font-black text-teal-200/50 uppercase tracking-widest text-center mb-2.5 font-mono">
-          SCORE GLOBAL DU TOURNOI
-        </p>
-        <div class="flex justify-between items-center bg-black/30 p-2.5 rounded-xl border border-[#2dd4bf]/10">
-          <div class="text-left">
-            <span class="text-[9px] text-[#2dd4bf]/70 font-bold block uppercase leading-none font-mono">VOUS</span>
-            <span class="text-base font-mono font-black text-[#2dd4bf]" id="modalScorePlayerLabel">0 <span class="text-[10px] font-normal">/100</span></span>
-          </div>
-          <div class="text-center text-[10px] font-bold text-slate-400 px-2 bg-white/5 rounded-md self-center">VS</div>
-          <div class="text-right">
-            <span class="text-[9px] text-rose-400 block uppercase leading-none font-mono" id="modalOppScoreLabelSub">RIVAL</span>
-            <span class="text-base font-mono font-black text-rose-400" id="modalScoreComputerLabel">0 <span class="text-[10px] font-normal font-sans">/100</span></span>
-          </div>
-        </div>
-      </div>
-
-      <button id="modalBtnContinue" class="mt-6 w-full py-3.5 rounded-2xl immersive-btn-teal font-black text-xs uppercase shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer font-display">
-        <span>Continuer la partie</span> ➜
-      </button>
-    </div>
-  </div>
-
-  <!-- Tournament End Victory/Defeat screen modal -->
-  <div id="tournamentEndModal" class="hidden fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fade-in">
-    <div class="bg-[#0b2b29] border-4 border-dashed border-[#2dd4bf] rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl relative overflow-hidden animate-scale-up">
-      <div class="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(circle_at_center,#2dd4bf_0%,transparent_80%)]"></div>
-
-      <!-- Win / Loss details dynamic -->
-      <div class="flex flex-col items-center">
-        <div id="tournamentEndIcon" class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-yellow-400 to-teal-500 border-2 border-yellow-400/80 flex items-center justify-center mb-5 rotate-6 shadow-lg">
-          🏆
-        </div>
-        
-        <div id="tournamentBadgeText" class="text-[10px] bg-teal-950 text-teal-300 border border-[#2dd4bf]/30 font-black px-3 py-1 rounded-full uppercase tracking-widest text-center font-mono">
-          🏆 CHAMPIONNAT REMPORTÉ !
-        </div>
-        
-        <h2 id="tournamentTitleText" class="text-2xl font-black text-[#2dd4bf] mt-3 leading-none uppercase font-display">
-          Vainqueur Absolu !
-        </h2>
-        
-        <p id="tournamentEndDesc" class="text-xs text-teal-101/70 mt-4 leading-relaxed font-sans">
-          Félicitations pour votre incroyable adresse tactique ! Vous repartez avec les honneurs.
-        </p>
-
-        <!-- Final values table -->
-        <div class="mt-5 w-full bg-black/45 p-3 rounded-xl border border-white/5 flex justify-around text-center">
-          <div>
-            <span class="text-[9px] text-[#2dd4bf]/70 block font-bold font-mono">Votre score</span>
-            <span id="tournamentFinalPlayerScore" class="font-mono text-xl font-black text-[#2dd4bf]">102 pts</span>
-          </div>
-          <div class="w-[1px] h-8 bg-white/10"></div>
-          <div>
-            <span id="tournamentFinalOppName" class="text-[9px] text-rose-400 block font-bold font-mono">Carlos</span>
-            <span id="tournamentFinalComputerScore" class="font-mono text-xl font-black text-rose-404 text-rose-400">45 pts</span>
-          </div>
-        </div>
-
-        <!-- Buttons triggers depending on win state status -->
-        <div class="mt-6 w-full flex flex-col gap-2">
-          <button id="tournamentNextBtn" class="w-full py-4 rounded-2xl immersive-btn-teal font-black text-xs uppercase flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-95 transition-all">
-            <span>Affronter le pays suivant </span> ➜
-          </button>
-          
-          <button id="tournamentRetryBtn" class="w-full py-4 rounded-2xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 font-black text-xs uppercase flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-95 transition-all text-white border-2 border-slate-900">
-            <span>Prendre ma revanche 🔄</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Web Game Controller Logic Script -->
-  <script>
-    // Audio Sound Synthesizers (Web Audio API)
-    let isMuted = false;
-    let audioContext = null;
-
-    function getAudioContext() {
-      if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    <style>
+      .immersive-bg {
+        background: radial-gradient(circle at 50% 30%, #115e59 0%, #042f2e 100%);
       }
-      return audioContext;
-    }
-
-    function synthesizeSound(freqs, duration, type = 'sine', gainSequence = [0.1, 0]) {
-      if (isMuted) return;
-      try {
-        const ctx = getAudioContext();
-        if (ctx.state === 'suspended') {
-          ctx.resume();
-        }
-        const osc = ctx.createOscillator();
-        const gainNode = ctx.createGain();
-        osc.connect(gainNode);
-        gainNode.connect(ctx.destination);
-        
-        osc.type = type;
-        
-        const now = ctx.currentTime;
-        // set frequency sequences
-        if (typeof freqs === 'number') {
-          osc.frequency.setValueAtTime(freqs, now);
-        } else {
-          freqs.forEach((f, idx) => {
-            osc.frequency.setValueAtTime(f[0], now + f[1]);
-          });
-        }
-        
-        // gain values
-        gainNode.gain.setValueAtTime(gainSequence[0], now);
-        gainNode.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-        
-        osc.start(now);
-        osc.stop(now + duration);
-      } catch (e) {
-        console.warn('Audio synthesis failed:', e);
+      .immersive-header {
+        background: rgba(4, 47, 46, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(45, 212, 191, 0.15);
       }
-    }
-
-    const soundEffects = {
-      click: () => synthesizeSound(450, 0.08, 'sine', [0.08, 0]),
-      place: () => synthesizeSound([[320, 0], [480, 0.03]], 0.15, 'triangle', [0.12, 0]),
-      draw: () => synthesizeSound([[220, 0], [330, 0.05], [440, 0.09]], 0.22, 'sine', [0.06, 0]),
-      shuffle: () => {
-        // synthesize domino shuffling sound
-        const ctx = getAudioContext();
-        let delay = 0;
-        for (let i = 0; i < 6; i++) {
-          setTimeout(() => {
-            synthesizeSound(200 + Math.random() * 300, 0.1, 'triangle', [0.03, 0]);
-          }, delay);
-          delay += 75;
-        }
-      },
-      victory: () => {
-        synthesizeSound([[440, 0], [554, 0.1], [659, 0.2], [880, 0.35]], 0.6, 'sine', [0.15, 0]);
-      },
-      loss: () => {
-        synthesizeSound([[440, 0], [415, 0.15], [392, 0.3], [349, 0.45]], 0.7, 'triangle', [0.12, 0]);
+      .immersive-panel {
+        background: rgba(2, 21, 20, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(45, 212, 191, 0.15);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
       }
-    };
-
-    // Trigger Audio Sound Effect Helpers
-    function triggerSound(ref) {
-      if (soundEffects[ref]) {
-        try {
-          soundEffects[ref]();
-        } catch (_) {}
+      .immersive-panel-dark {
+        background: rgba(2, 12, 11, 0.85);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(45, 212, 191, 0.1);
       }
-    }
-
-    // List of Opponents (Visual visual cues, specific descriptions and behaviors)
-    const OPPONENTS = [
-      { name: "Carlos", country: "Brésil", flag: "🇧🇷", desc: "Danseur de samba au jeu très tactique 🕺" },
-      { name: "Yuki", country: "Japon", flag: "🇯🇵", desc: "Maître zen d'une précision redoutable 🥋" },
-      { name: "Sarah", country: "États-Unis", flag: "🇺🇸", desc: "As du bluff et des décisions éclair 🤠" },
-      { name: "Pierre", country: "France", flag: "🇫🇷", desc: "Fin tacticien adepte de stratégie pure 🥐" },
-      { name: "Lorenzo", country: "Italie", flag: "🇮🇹", desc: "Créatif plein de passion italienne 🍝" },
-      { name: "Fatou", country: "Sénégal", flag: "🇸🇳", desc: "Reine impitoyable des blocages d'arène 🦁" }
-    ];
-
-    // Core Game variables State
-    let opponentIndex = 0;
-    let tournamentPlayerScore = 0;
-    let tournamentComputerScore = 0;
-    let roundNumber = 1;
-    let selectedDominoId = null;
-    let aiThinking = false;
-    let aiStatusInterval = null;
-
-    // Hands, board, boneyard (Talon)
-    let playerHand = [];
-    let computerHand = [];
-    let boneyard = [];
-    let board = []; // PlacedDomino: { id, value: [number, number], arrangedValue: [number, number], isDouble: boolean }
-    let starterDomino = null;
-    let turn = 'player'; // 'player' | 'computer'
-    let lastActionLog = '';
-
-    // Logs Array
-    let logs = [];
-
-    // Sound initializer hook on DOM launch
-    document.addEventListener('click', () => {
-      // Warm up Audio Context on click
-      try {
-        const ctx = getAudioContext();
-        if (ctx && ctx.state === 'suspended') {
-          ctx.resume();
-        }
-      } catch (_) {}
-    }, { once: true });
-
-    // UI Toast Helper
-    function showToast(message) {
-      const toast = document.getElementById('toastNotification');
-      toast.innerText = message;
-      toast.style.opacity = '1';
-      toast.style.transform = 'translateY(0px)';
-      
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(12px)';
-      }, 2500);
-    }
-
-    // Toggle Sound implementation
-    document.getElementById('soundToggle').addEventListener('click', () => {
-      isMuted = !isMuted;
-      triggerSound('click');
-      const soundIcon = document.getElementById('soundIcon');
-      soundIcon.innerText = isMuted ? '🔇' : '🔊';
-      showToast(isMuted ? 'Sons désactivés' : 'Sons activés !');
-    });
-
-    // Logging Console Helper
-    function addLog(text, sender = 'system') {
-      const now = new Date();
-      const timestamp = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      const id = Date.now() + Math.random().toString();
-      
-      logs.unshift({ id, text, sender, timestamp });
-      if (logs.length > 50) logs.pop();
-
-      // Render logs
-      const logsConsole = document.getElementById('logsConsole');
-      if (logsConsole) {
-        logsConsole.innerHTML = logs.map(log => {
-          let cssClass = 'text-teal-200/50';
-          if (log.sender === 'player') cssClass = 'text-yellow-300 font-medium';
-          if (log.sender === 'computer') cssClass = 'text-teal-300 font-medium';
-          if (log.sender === 'system') cssClass = 'text-emerald-400 font-bold';
-          
-          return `
-            <div class="mb-2 border-b border-teal-500/10 pb-1 flex flex-col">
-              <span class="text-[8px] text-teal-600 font-mono">${log.timestamp}</span>
-              <span class="${cssClass} font-mono mt-0.5">${log.text}</span>
-            </div>
-          `;
-        }).join('');
+      .playable-tile-glow {
+        box-shadow: 0 0 16px rgba(45, 212, 191, 0.4);
       }
-
-      // Update last actions indicator
-      lastActionLog = text;
-      const lastLabel = document.getElementById('lastActionLabel');
-      if (lastLabel) {
-        lastLabel.innerText = `Dernière action: ${text}`;
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
       }
-    }
-
-    // Domino Deck Gen
-    function generateDeck() {
-      const list = [];
-      let counter = 0;
-      for (let i = 0; i <= 6; i++) {
-        for (let j = i; j <= 6; j++) {
-          list.push({
-            id: `dom_${i}_${j}_${counter++}`,
-            value: [i, j],
-            isDouble: i === j
-          });
-        }
+      ::-webkit-scrollbar-track {
+        background: rgba(4, 47, 46, 0.2);
       }
-      return list;
-    }
-
-    function shuffleDeck(deck) {
-      const copy = [...deck];
-      for (let i = copy.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
+      ::-webkit-scrollbar-thumb {
+        background: rgba(45, 212, 191, 0.3);
+        border-radius: 4px;
       }
-      return copy;
-    }
-
-    // Calculate sum of pips inside the hand of a player
-    function calculateHandScore(hand) {
-      return hand.reduce((acc, d) => acc + d.value[0] + d.value[1], 0);
-    }
-
-    // Identify who starts depending on domino standard rules
-    // Starters list rules: Highest Double (6:6 down to 0:0). If no doubles, highest single (6:5 down... etc)
-    function determineStarter() {
-      const getDoubleVal = (hand) => {
-        const doubles = hand.filter(d => d.isDouble);
-        if (doubles.length === 0) return -1;
-        return Math.max(...doubles.map(d => d.value[0]));
-      };
-
-      const getHighSingleVal = (hand) => {
-        return Math.max(...hand.map(d => d.value[0] + d.value[1]));
-      };
-
-      const pD = getDoubleVal(playerHand);
-      const cD = getDoubleVal(computerHand);
-
-      if (pD !== -1 || cD !== -1) {
-        if (pD > cD) {
-          const starter = playerHand.find(d => d.isDouble && d.value[0] === pD);
-          return { turn: 'player', domino: starter };
-        } else {
-          const starter = computerHand.find(d => d.isDouble && d.value[0] === cD);
-          return { turn: 'computer', domino: starter };
-        }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(45, 212, 191, 0.5);
       }
+    </style>
+  </head>
+  <body class="bg-teal-950 text-slate-100 font-sans antialiased min-h-screen selection:bg-teal-500 selection:text-teal-950">
+    <div id="root"></div>
 
-      // No double found, look for highest single value sum
-      const pS = getHighSingleVal(playerHand);
-      const cS = getHighSingleVal(computerHand);
+    <script type="text/babel">
+      const { useState, useEffect, useRef } = React;
 
-      if (pS >= cS) {
-        const starter = playerHand.find(d => (d.value[0] + d.value[1]) === pS);
-        return { turn: 'player', domino: starter };
-      } else {
-        const starter = computerHand.find(d => (d.value[0] + d.value[1]) === cS);
-        return { turn: 'computer', domino: starter };
-      }
-    }
+      // Audio Synthesis Manager (Web Audio API)
+      let audioCtx = null;
+      let isMutedSetting = false;
 
-    // Check of allowed placements
-    function checkIsPlayable(domino) {
-      if (board.length === 0) {
-        return { left: true, right: true, any: true };
-      }
-      const leftEnd = board[0].arrangedValue[0];
-      const rightEnd = board[board.length - 1].arrangedValue[1];
-
-      const matchesLeft = domino.value[0] === leftEnd || domino.value[1] === leftEnd;
-      const matchesRight = domino.value[0] === rightEnd || domino.value[1] === rightEnd;
-
-      return {
-        left: matchesLeft,
-        right: matchesRight,
-        any: matchesLeft || matchesRight
-      };
-    }
-
-    function playerHasAnyPlay() {
-      return playerHand.some(d => checkIsPlayable(d).any);
-    }
-
-    function computerHasAnyPlay() {
-      return computerHand.some(d => checkIsPlayable(d).any);
-    }
-
-    // Initalize game round loop
-    function initRound() {
-      selectedDominoId = null;
-      aiThinking = false;
-      document.getElementById('turnBadgePlayer').classList.add('hidden');
-      document.getElementById('turnBadgeComputer').classList.add('hidden');
-      
-      const currentOpponent = OPPONENTS[opponentIndex];
-      triggerSound('shuffle');
-
-      // Prepare fresh card hands
-      const freshDeck = generateDeck();
-      const shuffled = shuffleDeck(freshDeck);
-
-      playerHand = shuffled.slice(0, 7);
-      computerHand = shuffled.slice(7, 14);
-      boneyard = shuffled.slice(14);
-      board = [];
-
-      // Determine who holds the best starter
-      const starterInfo = determineStarter();
-      starterDomino = starterInfo.domino;
-      turn = starterInfo.turn;
-
-      logs = [];
-      addLog(`Round ${roundNumber} lancé contre ${currentOpponent.flag} ${currentOpponent.name} ! Chacun reçoit 7 dominos`, 'system');
-      
-      const starterStr = `[${starterDomino.value[0]}|${starterDomino.value[1]}]`;
-      if (starterInfo.turn === 'player') {
-        addLog(`Vous commencez ! Sélectionnez votre domino obligatoire: ${starterStr}`, 'player');
-      } else {
-        addLog(`${currentOpponent.name} possède le domino de départ : ${starterStr}. Il entame !`, 'computer');
-      }
-
-      updateUI();
-
-      // Trigger AI turn if it is opponent
-      if (turn === 'computer') {
-        setTimeout(triggerAiTurn, 1800);
-      }
-    }
-
-    // Start a completely fresh Match against an opponent index
-    function startNewMatch(index) {
-      opponentIndex = index;
-      tournamentPlayerScore = 0;
-      tournamentComputerScore = 0;
-      roundNumber = 1;
-      
-      // Update header elements static values
-      const currentOpponent = OPPONENTS[opponentIndex];
-      document.getElementById('oppFlag').innerText = currentOpponent.flag;
-      document.getElementById('oppDesc').innerText = currentOpponent.desc;
-      document.getElementById('oppName').innerText = currentOpponent.name;
-      document.getElementById('oppCountry').innerText = currentOpponent.country;
-      document.getElementById('oppScoreLabel').innerText = currentOpponent.name;
-      document.getElementById('oppFace').innerText = currentOpponent.flag;
-      document.getElementById('oppLabelName').innerText = currentOpponent.name;
-
-      document.getElementById('roundModal').classList.add('hidden');
-      document.getElementById('tournamentEndModal').classList.add('hidden');
-
-      initRound();
-    }
-
-    // Main action triggers to check victory cases inside a game
-    function checkRoundEndConditions() {
-      const currentOpponent = OPPONENTS[opponentIndex];
-      
-      // Case 1: Player empty hand
-      if (playerHand.length === 0) {
-        const roundPoints = calculateHandScore(computerHand);
-        tournamentPlayerScore += roundPoints;
-        triggerSound('victory');
-        showRoundModal('player', roundPoints);
-        return true;
-      }
-      
-      // Case 2: AI empty hand
-      if (computerHand.length === 0) {
-        const roundPoints = calculateHandScore(playerHand);
-        tournamentComputerScore += roundPoints;
-        triggerSound('loss');
-        showRoundModal('computer', roundPoints);
-        return true;
-      }
-
-      // Case 3: Blocked! None have play options and Talon empty
-      if (!playerHasAnyPlay() && !computerHasAnyPlay() && boneyard.length === 0) {
-        const playerRest = calculateHandScore(playerHand);
-        const computerRest = calculateHandScore(computerHand);
-
-        addLog(`Arène verrouillée ! Aucun coup n'est possible et talon vide.`, 'system');
-
-        if (playerRest < computerRest) {
-          // Player has less points, wins
-          const points = computerRest;
-          tournamentPlayerScore += points;
-          triggerSound('victory');
-          showRoundModal('player', points, `Bloqué ! Vous gagnez car votre main est la plus légère (${playerRest} pts vs ${computerRest} pts).`);
-        } else if (computerRest < playerRest) {
-          // AI has less points, wins
-          const points = playerRest;
-          tournamentComputerScore += points;
-          triggerSound('loss');
-          showRoundModal('computer', points, `Bloqué ! ${currentOpponent.name} gagne car sa main est la plus légère (${computerRest} pts vs ${playerRest} pts).`);
-        } else {
-          // Tie block
-          triggerSound('click');
-          showRoundModal('draw', 0);
-        }
-        return true;
-      }
-
-      return false;
-    }
-
-    // Handles Round continuing next step validation
-    function handleRoundContinue() {
-      document.getElementById('roundModal').classList.add('hidden');
-
-      const isPlayer100 = tournamentPlayerScore >= 100;
-      const isComputer100 = tournamentComputerScore >= 100;
-      const isMaxRounds = roundNumber >= 12;
-
-      if (isPlayer100 || isComputer100 || isMaxRounds) {
-        // Conclude tournament match
-        let finalWinner = 'player';
-        if (isPlayer100 && !isComputer100) {
-          finalWinner = 'player';
-        } else if (isComputer100 && !isPlayer100) {
-          finalWinner = 'computer';
-        } else {
-          finalWinner = tournamentPlayerScore >= tournamentComputerScore ? 'player' : 'computer';
-        }
-
-        showTournamentEndModal(finalWinner);
-      } else {
-        roundNumber += 1;
-        initRound();
-      }
-    }
-
-    // Trigger Open state for Round Completing Popup Modal
-    function showRoundModal(winner, pointsGained, customDesc = null) {
-      const currentOpponent = OPPONENTS[opponentIndex];
-      document.getElementById('modalRoundHeader').innerText = `ROUND ${roundNumber}`;
-      
-      const statusBlock = document.getElementById('modalWinStatus');
-      const pCount = calculateHandScore(playerHand);
-      const cCount = calculateHandScore(computerHand);
-
-      document.getElementById('modalPlayerScoreSum').innerText = `${pCount} pts`;
-      document.getElementById('modalComputerScoreSum').innerText = `${cCount} pts`;
-      document.getElementById('modalOppLabelPoints').innerText = `Dominos ${currentOpponent.name}`;
-
-      // Global scoreboard summaries
-      document.getElementById('modalScorePlayerLabel').innerHTML = `${tournamentPlayerScore} <span class="text-[10px] font-normal">/100</span>`;
-      document.getElementById('modalOppScoreLabelSub').innerText = currentOpponent.name;
-      document.getElementById('modalScoreComputerLabel').innerHTML = `${tournamentComputerScore} <span class="text-[10px] font-normal">/100</span>`;
-
-      if (winner === 'player') {
-        statusBlock.innerHTML = `
-          <div class="w-14 h-14 rounded-full bg-teal-500/20 border-2 border-teal-400/60 flex items-center justify-center mb-3 mx-auto animate-bounce">
-            🏆
-          </div>
-          <h3 class="text-xl font-black text-[#2dd4bf] leading-tight font-display">
-            Manche Remportée !
-          </h3>
-          <p class="text-xs text-teal-100/70 mt-2 leading-relaxed">
-            ${customDesc || `Vous videz vos dominos avant ${currentOpponent.name} et récupérez sa main.`}
-          </p>
-          <div class="mt-4 px-4 py-2 rounded-xl bg-teal-950/60 border border-[#2dd4bf]/20 text-sm font-mono font-black text-[#2dd4bf] inline-block">
-            Score du round : +${pointsGained} points !
-          </div>
-        `;
-      } else if (winner === 'computer') {
-        statusBlock.innerHTML = `
-          <div class="w-14 h-14 rounded-full bg-rose-500/20 border-2 border-rose-450/40 flex items-center justify-center mb-3 mx-auto">
-            <span>${currentOpponent.flag}</span>
-          </div>
-          <h3 class="text-xl font-black text-rose-400 leading-tight font-display">
-            Manche perdue
-          </h3>
-          <p class="text-xs text-rose-100/70 mt-2 leading-relaxed">
-            ${customDesc || `${currentOpponent.name} s'est débarrassé de ses pièces avant vous et récupère votre main.`}
-          </p>
-          <div class="mt-4 px-4 py-2 rounded-xl bg-rose-950/40 border border-rose-500/20 text-sm font-mono font-black text-rose-450 inline-block">
-            Score retenu : +${pointsGained} points pour l'IA
-          </div>
-        `;
-      } else {
-        // Draw case
-        statusBlock.innerHTML = `
-          <div class="w-14 h-14 rounded-full bg-slate-500/20 border-2 border-slate-400/50 flex items-center justify-center mb-3 mx-auto">
-            <span>🤝</span>
-          </div>
-          <h3 class="text-xl font-black text-slate-200 leading-tight font-display">
-            Égalité Bloquée
-          </h3>
-          <p class="text-xs text-slate-300 mt-2 leading-relaxed">
-            Les deux mains de l'arène sont verrouillées avec la même somme de points ! Aucun joueur ne marque.
-          </p>
-        `;
-      }
-
-      document.getElementById('roundModal').classList.remove('hidden');
-    }
-
-    // Final Tournament end Modal Display triggers
-    function showTournamentEndModal(winner) {
-      const currentOpponent = OPPONENTS[opponentIndex];
-      const visualIcon = document.getElementById('tournamentEndIcon');
-      const badge = document.getElementById('tournamentBadgeText');
-      const title = document.getElementById('tournamentTitleText');
-      const desc = document.getElementById('tournamentEndDesc');
-
-      document.getElementById('tournamentFinalPlayerScore').innerText = `${tournamentPlayerScore} pts`;
-      document.getElementById('tournamentFinalOppName').innerText = currentOpponent.name;
-      document.getElementById('tournamentFinalComputerScore').innerText = `${tournamentComputerScore} pts`;
-
-      if (winner === 'player') {
-        triggerSound('victory');
-        visualIcon.className = "w-20 h-20 rounded-2xl bg-gradient-to-tr from-yellow-400 to-teal-500 border-2 border-yellow-400/80 flex items-center justify-center mb-5 rotate-6 shadow-lg";
-        visualIcon.innerHTML = "🏆";
-        badge.className = "text-[10px] bg-teal-950 text-teal-300 border border-[#2dd4bf]/30 font-black px-3 py-1 rounded-full uppercase tracking-widest text-center font-mono";
-        badge.innerText = "🏆 CHAMPIONNAT REMPORTÉ !";
-        title.className = "text-2xl font-black text-[#2dd4bf] mt-3 leading-none uppercase font-display";
-        title.innerText = "BORD ROYAL CONQUIS !";
-        desc.innerText = `Félicitations prodigieuses ! Vous avez battu ${currentOpponent.name} en atteignant en premier la cible suprême des 100 points. Vous pouvez passer au pays suivant !`;
-
-        if (opponentIndex < OPPONENTS.length - 1) {
-          document.getElementById('tournamentNextBtn').style.display = 'flex';
-          document.getElementById('tournamentNextBtn').innerHTML = `<span>Défier le Pays Suivant (${OPPONENTS[opponentIndex + 1].flag})</span> ➜`;
-        } else {
-          document.getElementById('tournamentNextBtn').style.display = 'flex';
-          document.getElementById('tournamentNextBtn').innerHTML = `<span>Recommencer le Championnat (🇧🇷)</span> ➜`;
-        }
-        document.getElementById('tournamentRetryBtn').style.display = 'none';
-      } else {
-        triggerSound('loss');
-        visualIcon.className = "w-20 h-20 rounded-2xl bg-black/55 border-2 border-rose-500/40 flex items-center justify-center mb-5 shadow-inner";
-        visualIcon.innerHTML = "<span class='text-4xl filter grayscale'>💀</span>";
-        badge.className = "text-[10px] bg-rose-950 text-rose-400 border border-rose-500/30 font-black px-3 py-1 rounded-full uppercase tracking-widest text-center font-mono";
-        badge.innerText = "😭 DÉFAITE EN FINALE";
-        title.className = "text-2xl font-black text-rose-400 mt-3 leading-none uppercase font-display";
-        title.innerText = "L'IA VOUS A COIFFÉ !";
-        desc.innerText = `${currentOpponent.name} a atteint avant vous les 100 points critiques requis. Ne baissez pas les bras, prenez votre revanche !`;
-
-        document.getElementById('tournamentNextBtn').style.display = 'none';
-        document.getElementById('tournamentRetryBtn').style.display = 'flex';
-        document.getElementById('tournamentRetryBtn').innerText = `Recommencer le Match (${currentOpponent.flag})`;
-      }
-
-      document.getElementById('tournamentEndModal').classList.remove('hidden');
-    }
-
-    // Opponent player triggers next step
-    document.getElementById('tournamentNextBtn').addEventListener('click', () => {
-      const nextIndex = (opponentIndex + 1) % OPPONENTS.length;
-      startNewMatch(nextIndex);
-    });
-
-    document.getElementById('tournamentRetryBtn').addEventListener('click', () => {
-      startNewMatch(opponentIndex);
-    });
-
-    document.getElementById('modalBtnContinue').addEventListener('click', handleRoundContinue);
-
-    // Render Domino Visual in HTML
-    function createDominoElement(domino, isGhost = false, alignment = 'vertical', customClickFn = null, isFaceDown = false, isHighlighted = false) {
-      const tile = document.createElement('div');
-      
-      let flexDir = alignment === 'vertical' ? 'flex-col' : 'flex-row';
-      let heightWidth = alignment === 'vertical' ? 'w-10 h-16' : 'w-16 h-10';
-      if (domino.isDouble) {
-        heightWidth = 'w-10 h-10'; // Doubles look better as squares or aligned
-        flexDir = 'flex-col';
-      }
-      
-      let borderStyle = isGhost ? 'border-2 border-dashed border-teal-500/50 bg-[#2dd4bf]/10' : 'bg-slate-100 text-slate-900 border-2 border-slate-300';
-      if (isFaceDown) {
-        borderStyle = 'bg-gradient-to-br from-teal-800 to-teal-950 border-2 border-[#2dd4bf]/60 shadow-[inset_0_2px_4px_rgba(255,255,255,0.1),0_4px_10px_rgba(0,0,0,0.5)]';
-      }
-      if (isHighlighted) {
-        borderStyle = 'bg-teal-50 text-slate-950 border-2 border-[#2dd4bf] ring-2 ring-[#2dd4bf]/40 scale-105 shadow-[0_0_12px_rgba(45,212,191,0.5)]';
-      }
-
-      tile.className = `flex ${flexDir} justify-between items-center ${heightWidth} rounded-xl shrink-0 p-1 relative shadow-md select-none transition-all duration-200 ${customClickFn ? 'cursor-pointer hover:scale-105 hover:-translate-y-px' : ''}`;
-      
-      tile.style.userSelect = 'none';
-      if (!isFaceDown && !isGhost) {
-        tile.className += ' bg-amber-50'; // standard real domino background
-      }
-
-      if (customClickFn) {
-        tile.addEventListener('click', (e) => {
-          e.stopPropagation();
-          customClickFn(domino.id);
-        });
-      }
-
-      if (isFaceDown) {
-        // Render facedown decorative elements
-        tile.innerHTML = `
-          <div class="w-full h-full rounded border border-teal-500/20 bg-teal-950/40 shadow-inner flex flex-col items-center justify-center p-1">
-            <div class="text-[9px] text-[#2dd4bf] font-mono tracking-tighter leading-none select-none font-bold">DPX</div>
-          </div>
-        `;
-        return tile;
-      }
-
-      if (isGhost) {
-        tile.classList.add('opacity-70', 'animate-pulse');
-        tile.innerHTML = `<div class="w-full h-full flex items-center justify-center text-teal-400 font-black text-xs">+</div>`;
-        return tile;
-      }
-
-      // Draw standard double pips
-      const val1 = domino.value[0];
-      const val2 = domino.value[1];
-
-      function renderHalf(val) {
-        const d = document.createElement('div');
-        d.className = 'w-full h-full flex items-center justify-center relative p-0.5';
-        
-        // Render simple pips using canvas or SVGs, or clean Grid. Grid is very safe and highly visual!
-        let htmlPips = `<div class="domino-pips">`;
-        
-        const pipIndex = {
-          0: [],
-          1: [4],
-          2: [0, 8],
-          3: [0, 4, 8],
-          4: [0, 2, 6, 8],
-          5: [0, 2, 4, 6, 8],
-          6: [0, 2, 3, 5, 6, 8],
-        }[val] || [];
-
-        for (let i = 0; i < 9; i++) {
-          if (pipIndex.includes(i)) {
-            htmlPips += `<div class="flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-slate-900"></div></div>`;
-          } else {
-            htmlPips += `<div></div>`;
+      function getAudioContext() {
+        if (isMutedSetting) return null;
+        if (!audioCtx) {
+          try {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          } catch (e) {
+            console.warn("Web Audio API not supported", e);
           }
         }
-        htmlPips += '</div>';
-        d.innerHTML = htmlPips;
-        return d;
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        return audioCtx;
       }
 
-      const h1 = renderHalf(val1);
-      const h2 = renderHalf(val2);
+      const sounds = {
+        playClick: () => {
+          const ctx = getAudioContext();
+          if (!ctx) return;
+          const osc = ctx.createOscillator();
+          const gainNode = ctx.createGain();
+          osc.connect(gainNode);
+          gainNode.connect(ctx.destination);
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(800, ctx.currentTime);
+          gainNode.gain.setValueAtTime(0.04, ctx.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.04);
+        },
+        playDraw: () => {
+          const ctx = getAudioContext();
+          if (!ctx) return;
+          const osc = ctx.createOscillator();
+          const gainNode = ctx.createGain();
+          const filter = ctx.createBiquadFilter();
+          osc.connect(filter);
+          filter.connect(gainNode);
+          gainNode.connect(ctx.destination);
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(160, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.15);
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(1000, ctx.currentTime);
+          filter.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + 0.15);
+          gainNode.gain.setValueAtTime(0, ctx.currentTime);
+          gainNode.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.03);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.16);
+        },
+        playTilePlace: () => {
+          const ctx = getAudioContext();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          
+          const osc1 = ctx.createOscillator();
+          const gain1 = ctx.createGain();
+          osc1.type = 'triangle';
+          osc1.frequency.setValueAtTime(1200, now);
+          osc1.frequency.exponentialRampToValueAtTime(800, now + 0.03);
+          gain1.gain.setValueAtTime(0.2, now);
+          gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+          osc1.connect(gain1);
+          gain1.connect(ctx.destination);
+          osc1.start(now);
+          osc1.stop(now + 0.05);
 
-      // Separator line
-      const separator = document.createElement('div');
-      if (alignment === 'vertical') {
-        separator.className = 'w-full h-0.5 bg-slate-400 shrink-0 select-none';
-      } else {
-        separator.className = 'h-full w-0.5 bg-slate-400 shrink-0 select-none';
-      }
+          const osc2 = ctx.createOscillator();
+          const gain2 = ctx.createGain();
+          osc2.type = 'sine';
+          osc2.frequency.setValueAtTime(190, now);
+          osc2.frequency.exponentialRampToValueAtTime(130, now + 0.07);
+          gain2.gain.setValueAtTime(0.3, now);
+          gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+          osc2.connect(gain2);
+          gain2.connect(ctx.destination);
+          osc2.start(now);
+          osc2.stop(now + 0.09);
+        },
+        playShuffle: () => {
+          const ctx = getAudioContext();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          for (let i = 0; i < 7; i++) {
+            const delay = i * 0.09 + Math.random() * 0.04;
+            setTimeout(() => {
+              const liveCtx = getAudioContext();
+              if (!liveCtx || isMutedSetting) return;
+              const tileNow = liveCtx.currentTime;
+              const osc = liveCtx.createOscillator();
+              const gain = liveCtx.createGain();
+              osc.type = 'triangle';
+              osc.frequency.setValueAtTime(550 + Math.random() * 400, tileNow);
+              gain.gain.setValueAtTime(0.08, tileNow);
+              gain.gain.exponentialRampToValueAtTime(0.001, tileNow + 0.04);
+              osc.connect(gain);
+              gain.connect(liveCtx.destination);
+              osc.start(tileNow);
+              osc.stop(tileNow + 0.05);
+            }, delay * 1000);
+          }
+        },
+        playSuccess: () => {
+          const ctx = getAudioContext();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          const notes = [261.63, 329.63, 392.00, 523.25];
+          notes.forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+            gainNode.gain.setValueAtTime(0, now + idx * 0.08);
+            gainNode.gain.linearRampToValueAtTime(0.12, now + idx * 0.08 + 0.04);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.35);
+            osc.start(now + idx * 0.08);
+            osc.stop(now + idx * 0.08 + 0.45);
+          });
+        },
+        playFail: () => {
+          const ctx = getAudioContext();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          const notes = [311.13, 293.66, 220.00, 146.83];
+          notes.forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+            gainNode.gain.setValueAtTime(0, now + idx * 0.12);
+            gainNode.gain.linearRampToValueAtTime(0.08, now + idx * 0.12 + 0.04);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.5);
+            osc.start(now + idx * 0.12);
+            osc.stop(now + idx * 0.12 + 0.6);
+          });
+        }
+      };
 
-      tile.appendChild(h1);
-      tile.appendChild(separator);
-      tile.appendChild(h2);
+      // Inline Vectors representing SVG icons
+      const Icons = {
+        Volume2: () => (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"/></svg>
+        ),
+        VolumeX: () => (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6L4.5 12m0 0l4.72 4.72a.75.75 0 011.28-.53V5.81a.75.75 0 01-1.28-.53L4.5 12z"/></svg>
+        ),
+        RotateCcw: () => (
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m-3.182 0h4.991"/></svg>
+        ),
+        HelpCircle: () => (
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
+        ),
+        ChevronLeft: () => (
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+        ),
+        ChevronRight: () => (
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+        ),
+        Trophy: () => (
+          <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-5.25A1.125 1.125 0 0010.5 15.375v3.375m9-10.5h-1.5m1.5 0a3 3 0 01-3 3h-7.5a3 3 0 01-3-3m9 0V4.5m-3 0h-3m4.5 12H18a3.75 3.75 0 000-7.5h-.75m-9 7.5H4.875a3.75 3.75 0 010-7.5h.75"/></svg>
+        ),
+        History: () => (
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        ),
+        Sparkles: () => (
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 21l-.813-5.096L3 15l5.096-.813L9 9l.813 5.096L15 15l-5.188.904zM19.051 7.14L18.5 10.5l-.551-3.36L14.5 6.5l3.36-.551L18.5 2.5l.551 3.36L22.5 6.5l-3.449.64z"/></svg>
+        ),
+        Play: () => (
+          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z"/></svg>
+        ),
+        ArrowRightLeft: () => (
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
+        ),
+        Check: () => (
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+        ),
+        AlertCircle: () => (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+        ),
+        Plus: () => (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+        ),
+        ArrowRight: () => (
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+        )
+      };
 
-      return tile;
-    }
+      const OPPONENTS = [
+        { name: "Carlos", country: "Brésil", flag: "🇧🇷", desc: "Danseur de samba au jeu très tactique 🕺" },
+        { name: "Yuki", country: "Japon", flag: "🇯🇵", desc: "Maître zen d'une précision redoutable 🥋" },
+        { name: "Sarah", country: "États-Unis", flag: "🇺🇸", desc: "As du bluff et des décisions éclair 🤠" },
+        { name: "Pierre", country: "France", flag: "🇫🇷", desc: "Fin de la stratégie et de la logique pure 🥐" },
+        { name: "Lorenzo", country: "Italie", flag: "🇮🇹", desc: "Joueur créatif plein de passion italienne 🍝" },
+        { name: "Fatou", country: "Sénégal", flag: "🇸🇳", desc: "Reine insaisissable des blocages d'arène 🦁" },
+      ];
 
-    // Refresh UI Component tree state elements
-    function updateUI() {
-      const currentOpponent = OPPONENTS[opponentIndex];
-      
-      // 1. Update Scores & header elements
-      document.getElementById('scorePlayer').innerText = tournamentPlayerScore;
-      document.getElementById('scoreComputer').innerText = tournamentComputerScore;
-      const roundCountEl = document.getElementById('roundCounter');
-      if (roundCountEl) {
-        roundCountEl.innerText = `ROUND ${roundNumber}`;
-      }
+      const generateDeck = () => {
+        const deck = [];
+        for (let i = 0; i <= 6; i++) {
+          for (let j = i; j <= 6; j++) {
+            deck.push({
+              id: `domino-${i}-${j}`,
+              value: [i, j],
+              isDouble: i === j,
+            });
+          }
+        }
+        return deck;
+      };
 
-      // Percentage and slider progress bars
-      const maxScore = 100;
-      const playerPctVal = Math.min(100, Math.round((tournamentPlayerScore / maxScore) * 100));
-      const computerPctVal = Math.min(100, Math.round((tournamentComputerScore / maxScore) * 100));
+      const shuffleDeck = (deck) => {
+        const newDeck = [...deck];
+        for (let i = newDeck.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const temp = newDeck[i];
+          newDeck[i] = newDeck[j];
+          newDeck[j] = temp;
+        }
+        return newDeck;
+      };
 
-      document.getElementById('pctPlayer').innerText = playerPctVal;
-      document.getElementById('pctComputer').innerText = computerPctVal;
+      const determineStarter = (playerHand, computerHand) => {
+        for (let d = 6; d >= 0; d--) {
+          const pDouble = playerHand.find(x => x.value[0] === d && x.value[1] === d);
+          if (pDouble) return { turn: 'player', domino: pDouble };
 
-      document.getElementById('progPlayer').style.width = `${playerPctVal}%`;
-      document.getElementById('progComputer').style.width = `${computerPctVal}%`;
+          const cDouble = computerHand.find(x => x.value[0] === d && x.value[1] === d);
+          if (cDouble) return { turn: 'computer', domino: cDouble };
+        }
 
-      // 2. Turns active banners visual state
-      if (turn === 'player' && !aiThinking) {
-        document.getElementById('turnBadgePlayer').classList.remove('hidden');
-        document.getElementById('turnBadgeComputer').classList.add('hidden');
-        document.getElementById('playerRingStatus').className = "w-1.5 h-1.5 rounded-full bg-[#2dd4bf] animate-ping";
-        document.getElementById('oppStatusRing').className = "w-2 h-2 rounded-full bg-rose-500";
-      } else {
-        document.getElementById('turnBadgePlayer').classList.add('hidden');
-        document.getElementById('turnBadgeComputer').classList.remove('hidden');
-        document.getElementById('playerRingStatus').className = "w-1.5 h-1.5 rounded-full bg-teal-900";
-        document.getElementById('oppStatusRing').className = "w-2 h-2 rounded-full bg-rose-500 animate-ping";
-      }
-
-      // 3. Render Computer Facedown cards overlapping like typical felt game cards
-      const compHandVal = document.getElementById('computerHandContainer');
-      compHandVal.innerHTML = '';
-      document.getElementById('oppTilesNum').innerText = computerHand.length;
-
-      if (computerHand.length > 0) {
-        computerHand.forEach(d => {
-          const compCard = createDominoElement(d, false, 'vertical', null, true);
-          // Scale it down a snippet for compact spacing
-          compCard.className += ' transform scale-75 origin-center shrink-0 hover:translate-y-[-4px] hover:z-10 focus:z-10 relative';
-          compHandVal.appendChild(compCard);
-        });
-      } else {
-        compHandVal.innerHTML = `<div class="text-xs text-teal-500/50 italic p-2 w-full text-center font-mono">L'IA n'a plus aucun domino</div>`;
-      }
-
-      // 4. Render central chain row
-      const boardChain = document.getElementById('boardChain');
-      boardChain.innerHTML = '';
-
-      const limits = selectedDominoId ? checkIsPlayable(playerHand.find(d => d.id === selectedDominoId)) : { left: false, right: false, any: false };
-
-      // Render Left slot placement target selector if any matched helper
-      if (board.length > 0 && limits.left && turn === 'player') {
-        const leftTarget = document.createElement('div');
-        leftTarget.className = 'snap-center ml-1 relative cursor-pointer group shrink-0';
-        leftTarget.addEventListener('click', () => placeSelectedTile('left'));
-        
-        const ghostTile = createDominoElement({ value: [0,0] }, true, 'vertical');
-        leftTarget.appendChild(ghostTile);
-        
-        // Dash frame trigger overlay
-        const activeOverlay = document.createElement('div');
-        activeOverlay.className = 'absolute inset-0 rounded-xl transition-all duration-200 border-2 border-dashed border-[#2dd4bf] bg-teal-400/10 group-hover:bg-teal-400/30 group-hover:scale-105 shadow-[0_0_8px_rgba(45,212,191,0.5)]';
-        leftTarget.appendChild(activeOverlay);
-        boardChain.appendChild(leftTarget);
-      }
-
-      // Empty field alert indicator when starting first action
-      if (board.length === 0) {
-        const starterAlert = document.createElement('div');
-        starterAlert.className = 'flex flex-col items-center justify-center gap-2 py-4 text-center mx-auto snap-center';
-        
-        const starterStr = `[${starterDomino.value[0]}|${starterDomino.value[1]}]`;
-        const actionRequired = turn === 'player' 
-          ? `Jouez impérativement votre domino de départ : <strong class="text-[#2dd4bf]">${starterStr}</strong>`
-          : `L'IA va entamer l'arène avec le domino de départ obligatoire : ${starterStr}`;
-
-        starterAlert.innerHTML = `
-          <div class="w-16 h-8 border border-dashed border-[#2dd4bf]/40 bg-[#2dd4bf]/5 rounded-xl flex items-center justify-center animate-pulse-soft">
-            <span class="text-[#2dd4bf]/60 font-black text-xs">🂾</span>
-          </div>
-          <div>
-            <p class="text-[#2dd4bf] font-black text-xs sm:text-sm tracking-wide font-display">L'ARÈNE EST PRÊTE !</p>
-            <p class="text-teal-200/50 text-[10px] sm:text-xs mt-1 max-w-xs leading-normal font-mono font-bold">${actionRequired}</p>
-          </div>
-        `;
-        boardChain.appendChild(starterAlert);
-      }
-
-      // Draw placed board tiles
-      board.forEach((placed, idx) => {
-        const domObj = { id: placed.id, value: placed.arrangedValue, isDouble: placed.isDouble };
-        const cardOrientation = placed.isDouble ? 'vertical' : 'horizontal';
-        const cardHTML = createDominoElement(domObj, false, cardOrientation);
-        cardHTML.className += ' snap-center transform transition-all duration-300 scale-90 sm:scale-100';
-        boardChain.appendChild(cardHTML);
-      });
-
-      // Render Right slot placement target
-      if (board.length > 0 && limits.right && turn === 'player') {
-        const rightTarget = document.createElement('div');
-        rightTarget.className = 'snap-center ml-1 relative cursor-pointer group shrink-0';
-        rightTarget.addEventListener('click', () => placeSelectedTile('right'));
-        
-        const ghostTile = createDominoElement({ value: [0,0] }, true, 'vertical');
-        rightTarget.appendChild(ghostTile);
-        
-        const activeOverlay = document.createElement('div');
-        activeOverlay.className = 'absolute inset-0 rounded-xl transition-all duration-200 border-2 border-dashed border-[#2dd4bf] bg-teal-400/10 group-hover:bg-teal-400/30 group-hover:scale-105 shadow-[0_0_8px_rgba(45,212,191,0.5)]';
-        rightTarget.appendChild(activeOverlay);
-        boardChain.appendChild(rightTarget);
-      }
-
-      // Board ends indicator text layout
-      const boardEndsEl = document.getElementById('boardEndsLabel');
-      if (board.length > 0) {
-        const leftValue = board[0].arrangedValue[0];
-        const rightValue = board[board.length - 1].arrangedValue[1];
-        boardEndsEl.innerText = `Bord actif: [${leftValue}] ••• [${rightValue}]`;
-      } else {
-        boardEndsEl.innerText = 'Aucun domino sur la table';
-      }
-
-      // Hide scroll buttons if board has very few placed elements
-      const scrButtons = document.getElementById('scrollButtonsContainer');
-      if (board.length > 3) {
-        scrButtons.style.display = 'flex';
-      } else {
-        scrButtons.style.display = 'none';
-      }
-
-      // 5. Render Player deck hands list
-      const pHandContainer = document.getElementById('playerHandContainer');
-      pHandContainer.innerHTML = '';
-      document.getElementById('playerHandCount').innerText = playerHand.length;
-
-      if (playerHand.length > 0) {
+        let bestPlayerDom = playerHand[0];
+        let bestPlayerSum = -1;
         playerHand.forEach(d => {
-          const spec = checkIsPlayable(d);
-          const isSelected = selectedDominoId === d.id;
-          const playable = spec.any && (turn === 'player');
-          const isHighlighted = isSelected;
+          const sum = d.value[0] + d.value[1];
+          if (sum > bestPlayerSum) {
+            bestPlayerSum = sum;
+            bestPlayerDom = d;
+          }
+        });
 
-          const card = createDominoElement(d, false, 'vertical', (id) => {
-            if (turn !== 'player' || aiThinking) return;
-            triggerSound('click');
-            
-            // Check obligatory first action domino starter
-            if (board.length === 0 && d.id !== starterDomino.id) {
-              addLog(`Action bloquée ! Vous devez d'abord poser votre domino de départ : [${starterDomino.value[0]}|${starterDomino.value[1]}]`, 'system');
-              showToast("Veuillez jouer voter domino obligatoire");
+        let bestComputerDom = computerHand[0];
+        let bestComputerSum = -1;
+        computerHand.forEach(d => {
+          const sum = d.value[0] + d.value[1];
+          if (sum > bestComputerSum) {
+            bestComputerSum = sum;
+            bestComputerDom = d;
+          }
+        });
+
+        if (bestPlayerSum >= bestComputerSum) {
+          return { turn: 'player', domino: bestPlayerDom };
+        } else {
+          return { turn: 'computer', domino: bestComputerDom };
+        }
+      };
+
+      const calculateHandScore = (hand) => {
+        return hand.reduce((total, d) => total + d.value[0] + d.value[1], 0);
+      };
+
+      function Dot({ active, size }) {
+        const sizeClasses = {
+          hand: 'w-2 h-2 sm:w-2.5 sm:h-2.5',
+          board: 'w-1.5 h-1.5 sm:w-2 sm:h-2',
+          compact: 'w-1 h-1 sm:w-1.5 sm:h-1.5',
+        };
+        const currentClass = sizeClasses[size] || sizeClasses.hand;
+        return (
+          <div className="flex items-center justify-center w-full h-full">
+            {active && (
+              <div className={`${currentClass} rounded-full bg-slate-950 transition-all duration-300 shadow-sm`} />
+            )}
+          </div>
+        );
+      }
+
+      function HalfDots({ value, size }) {
+        const getActiveIndices = (val) => {
+          switch (val) {
+            case 0: return [];
+            case 1: return [4];
+            case 2: return [0, 8];
+            case 3: return [0, 4, 8];
+            case 4: return [0, 2, 6, 8];
+            case 5: return [0, 2, 4, 6, 8];
+            case 6: return [0, 2, 3, 5, 6, 8];
+            default: return [];
+          }
+        };
+
+        const activeIndices = getActiveIndices(value);
+
+        return (
+          <div className="grid grid-cols-3 grid-rows-3 gap-[1px] w-full h-full p-1.5 sm:p-2 aspect-square">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <Dot key={i} active={activeIndices.includes(i)} size={size} />
+            ))}
+          </div>
+        );
+      }
+
+      function DominoTile({
+        domino,
+        orientation = 'vertical',
+        isFaceDown = false,
+        isPlayable = false,
+        isSelected = false,
+        isGhost = false,
+        size = 'hand',
+        onClick,
+        draggable = false,
+        onDragStart,
+      }) {
+        const isVertical = orientation === 'vertical';
+
+        const sizeStyles = {
+          hand: {
+            v: 'w-14 h-28 sm:w-16 sm:h-32 text-lg',
+            h: 'w-28 h-14 sm:w-32 sm:h-16 text-lg',
+          },
+          board: {
+            v: 'w-10 h-20 sm:w-12 sm:h-24 text-sm',
+            h: 'w-20 h-10 sm:w-24 sm:h-12 text-sm',
+          },
+          compact: {
+            v: 'w-8 h-16 sm:w-10 sm:h-20 text-xs',
+            h: 'w-16 h-8 sm:w-20 sm:h-10 text-xs',
+          },
+        };
+
+        const currentSizeClass = sizeStyles[size][isVertical ? 'v' : 'h'];
+
+        const handleDragStartInternal = (e) => {
+          if (draggable && onDragStart) {
+            onDragStart(e);
+          } else {
+            e.preventDefault();
+          }
+        };
+
+        if (isGhost) {
+          return (
+            <div
+              onClick={onClick}
+              className={`${currentSizeClass} border-2 border-dashed border-emerald-400/80 bg-emerald-400/10 hover:bg-emerald-400/25 cursor-pointer rounded-2xl flex items-center justify-center animate-pulse transition-all duration-200 shadow-md`}
+            >
+              <span className="text-emerald-400 text-2xl font-bold font-mono">+</span>
+            </div>
+          );
+        }
+
+        if (isFaceDown) {
+          return (
+            <div className={`${currentSizeClass} shrink-0 bg-slate-100 rounded-2xl border-4 border-slate-900 shadow-[2px_4px_8px_rgba(0,0,0,0.35)] relative select-none transform transition-all duration-300 p-[3px]`}>
+              <div className="w-full h-full bg-gradient-to-br from-teal-800 via-teal-950 to-slate-950 rounded-xl relative overflow-hidden flex items-center justify-center border border-teal-500/20">
+                <div className="absolute inset-0 opacity-15 bg-[repeating-linear-gradient(45deg,#2dd4bf_0px,#2dd4bf_4px,transparent_4px,transparent_12px)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(45,212,191,0.15)_0%,transparent_85%)]" />
+                <div className="w-6 h-6 sm:w-8 sm:h-8 border-2 border-teal-400/40 rounded-xl flex items-center justify-center rotate-45 bg-[#042f2e] shadow-inner font-bold">
+                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-teal-400 rounded-full animate-pulse shadow-[0_0_8px_#2dd4bf]" />
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        const [val1, val2] = domino.value;
+
+        return (
+          <div
+            onClick={onClick}
+            draggable={draggable}
+            onDragStart={handleDragStartInternal}
+            className={`
+              ${currentSizeClass}
+              shrink-0
+              bg-[#fefefe]
+              rounded-2xl
+              border-4
+              border-slate-900
+              relative
+              flex
+              ${isVertical ? 'flex-col' : 'flex-row'}
+              items-center
+              justify-between
+              cursor-pointer
+              select-none
+              transform
+              hover:-translate-y-2
+              hover:scale-105
+              active:translate-y-0
+              active:scale-95
+              transition-all
+              duration-300
+              shadow-[4px_6px_0px_#021211]
+              ${isPlayable ? 'ring-4 ring-[#2dd4bf] playable-tile-glow' : ''}
+              ${isSelected ? 'ring-4 ring-amber-400 -translate-y-2 scale-105 shadow-[6px_10px_0px_#021211]' : ''}
+            `}
+            style={{ touchAction: 'none' }}
+          >
+            <div className="w-full h-full max-w-full max-h-full flex items-center justify-center overflow-hidden">
+              <HalfDots value={val1} size={size} />
+            </div>
+
+            <div className={`bg-slate-300 shrink-0 relative flex items-center justify-center ${isVertical ? 'w-[85%] h-[2px] mx-auto' : 'h-[85%] w-[2px] my-auto'}`}>
+              <div className="absolute w-2 h-2 rounded-full bg-amber-600 border border-amber-400 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_1px_2px_rgba(0,0,0,0.5)] z-10" />
+            </div>
+
+            <div className="w-full h-full max-w-full max-h-full flex items-center justify-center overflow-hidden">
+              <HalfDots value={val2} size={size} />
+            </div>
+          </div>
+        );
+      }
+
+      function App() {
+        const [board, setBoard] = useState([]);
+        const [playerHand, setPlayerHand] = useState([]);
+        const [computerHand, setComputerHand] = useState([]);
+        const [boneyard, setBoneyard] = useState([]);
+        const [turn, setTurn] = useState('player');
+        const [victory, setVictory] = useState(null);
+        const [selectedDominoId, setSelectedDominoId] = useState(null);
+        const [starterDomino, setStarterDomino] = useState(null);
+        const [logs, setLogs] = useState([]);
+        const [aiThinking, setAiThinking] = useState(false);
+        const [aiStatus, setAiStatus] = useState('');
+        const [mutedState, setMutedState] = useState(false);
+        const [showRules, setShowRules] = useState(false);
+        const [isDraggedOverLeft, setIsDraggedOverLeft] = useState(false);
+        const [isDraggedOverRight, setIsDraggedOverRight] = useState(false);
+
+        // Tournament States
+        const [opponentIndex, setOpponentIndex] = useState(0);
+        const [tournamentPlayerScore, setTournamentPlayerScore] = useState(0);
+        const [tournamentComputerScore, setTournamentComputerScore] = useState(0);
+        const [roundNumber, setRoundNumber] = useState(1);
+        const [showRoundPopup, setShowRoundPopup] = useState(false);
+        const [roundWinner, setRoundWinner] = useState(null);
+        const [roundGainedPoints, setRoundGainedPoints] = useState(0);
+        const [showTournamentEndPopup, setShowTournamentEndPopup] = useState(false);
+        const [tournamentWinner, setTournamentWinner] = useState(null);
+
+        const boardScrollRef = useRef(null);
+        const logsEndRef = useRef(null);
+
+        const currentOpponent = OPPONENTS[opponentIndex] || OPPONENTS[0];
+
+        const toggleMuted = () => {
+          isMutedSetting = !isMutedSetting;
+          setMutedState(isMutedSetting);
+          sounds.playClick();
+        };
+
+        const addLog = (text, type) => {
+          const timeStr = new Date().toLocaleTimeString('fr-FR', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+          });
+          setLogs(prev => [
+            ...prev,
+            {
+              id: `log-${Date.now()}-${Math.random()}`,
+              text,
+              type,
+              timestamp: timeStr,
+            },
+          ]);
+        };
+
+        useEffect(() => {
+          logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, [logs]);
+
+        const initGame = (oppIdx = opponentIndex, isNewMatch = false) => {
+          sounds.playShuffle();
+          const freshDeck = generateDeck();
+          const shuffled = shuffleDeck(freshDeck);
+
+          const player = shuffled.slice(0, 7);
+          const computer = shuffled.slice(7, 14);
+          const boneyardRemaining = shuffled.slice(14);
+
+          const starterInfo = determineStarter(player, computer);
+
+          setBoard([]);
+          setPlayerHand(player);
+          setComputerHand(computer);
+          setBoneyard(boneyardRemaining);
+          setTurn(starterInfo.turn);
+          setStarterDomino(starterInfo.domino);
+          setVictory(null);
+          setSelectedDominoId(null);
+          setAiThinking(false);
+          setAiStatus('');
+
+          setLogs([]);
+          const opp = OPPONENTS[oppIdx] || OPPONENTS[0];
+          const starterStr = `[${starterInfo.domino.value[0]}|${starterInfo.domino.value[1]}]`;
+          addLog(`Round ${isNewMatch ? 1 : roundNumber} lancé contre ${opp.flag} ${opp.name} ! Chaque joueur reçoit 7 dominos.`, 'system');
+          if (starterInfo.turn === 'player') {
+            addLog(`Vous commencez ! Placez votre domino le plus fort : ${starterStr}`, 'player');
+          } else {
+            addLog(`${opp.name} commence car elle possède le domino le plus fort : ${starterStr}`, 'computer');
+          }
+        };
+
+        const startNewMatch = (index = opponentIndex) => {
+          setOpponentIndex(index);
+          setTournamentPlayerScore(0);
+          setTournamentComputerScore(0);
+          setRoundNumber(1);
+          setShowRoundPopup(false);
+          setRoundWinner(null);
+          setRoundGainedPoints(0);
+          setShowTournamentEndPopup(false);
+          setTournamentWinner(null);
+          initGame(index, true);
+        };
+
+        const handleRoundContinue = () => {
+          sounds.playClick();
+
+          const playerReached100 = tournamentPlayerScore >= 100;
+          const computerReached100 = tournamentComputerScore >= 100;
+          const roundsMaxReached = roundNumber >= 12;
+
+          if (playerReached100 || computerReached100 || roundsMaxReached) {
+            let winner = 'player';
+            if (playerReached100 && !computerReached100) {
+              winner = 'player';
+            } else if (computerReached100 && !playerReached100) {
+              winner = 'computer';
+            } else {
+              winner = tournamentPlayerScore >= tournamentComputerScore ? 'player' : 'computer';
+            }
+
+            setTournamentWinner(winner);
+            setShowRoundPopup(false);
+            setShowTournamentEndPopup(true);
+            if (winner === 'player') {
+              sounds.playSuccess();
+            } else {
+              sounds.playFail();
+            }
+          } else {
+            setRoundNumber(prev => prev + 1);
+            setShowRoundPopup(false);
+            initGame(opponentIndex);
+          }
+        };
+
+        const handleNextOpponent = () => {
+          sounds.playClick();
+          const nextIdx = (opponentIndex + 1) % OPPONENTS.length;
+          startNewMatch(nextIdx);
+        };
+
+        const handleRetryOpponent = () => {
+          sounds.playClick();
+          startNewMatch(opponentIndex);
+        };
+
+        useEffect(() => {
+          startNewMatch(0);
+        }, []);
+
+        const getBoardEnds = () => {
+          if (board.length === 0) return null;
+          const left = board[0].arrangedValue[0];
+          const right = board[board.length - 1].arrangedValue[1];
+          return { left, right };
+        };
+
+        const checkIsPlayable = (domino) => {
+          if (board.length === 0) {
+            const isStarter = starterDomino && domino.id === starterDomino.id;
+            return {
+              left: !!isStarter,
+              right: !!isStarter,
+              any: !!isStarter,
+            };
+          }
+
+          const ends = getBoardEnds();
+          if (!ends) return { left: false, right: false, any: false };
+
+          const [a, b] = domino.value;
+          const leftPlayable = a === ends.left || b === ends.left;
+          const rightPlayable = a === ends.right || b === ends.right;
+
+          return {
+            left: leftPlayable,
+            right: rightPlayable,
+            any: leftPlayable || rightPlayable,
+          };
+        };
+
+        const playerHasAnyPlay = () => playerHand.some(d => checkIsPlayable(d).any);
+        const computerHasAnyPlay = () => computerHand.some(d => checkIsPlayable(d).any);
+
+        const scrollBoard = (side) => {
+          setTimeout(() => {
+            if (boardScrollRef.current) {
+              const boardElem = boardScrollRef.current;
+              if (side === 'left') {
+                boardElem.scrollTo({ left: 0, behavior: 'smooth' });
+              } else {
+                boardElem.scrollTo({ left: boardElem.scrollWidth, behavior: 'smooth' });
+              }
+            }
+          }, 150);
+        };
+
+        const handlePlaceDomino = (dominoId, side) => {
+          const isPlayer = turn === 'player';
+          const hand = isPlayer ? playerHand : computerHand;
+          const domino = hand.find(d => d.id === dominoId);
+
+          if (!domino) return;
+
+          if (board.length === 0) {
+            if (starterDomino && domino.id !== starterDomino.id) {
+              addLog(`Erreur: Vous devez commencer par poser votre domino obligatoire: [${starterDomino.value[0]}|${starterDomino.value[1]}]`, 'system');
               return;
             }
 
-            if (board.length === 0) {
-              // Direct place
-              placeStarterDirectlyPlayer(d.id);
-            } else {
-              // Select it
-              if (selectedDominoId === d.id) {
-                selectedDominoId = null; // deselect
-              } else {
-                selectedDominoId = d.id;
-              }
-              updateUI();
-            }
-          }, false, isHighlighted);
-
-          // Apply visual filters depending on allowed parameters
-          if (turn === 'player' && !aiThinking) {
-            if (board.length === 0 && d.id !== starterDomino.id) {
-              card.className += ' opacity-30 cursor-not-allowed';
-            } else if (!playable) {
-              card.className += ' opacity-40 hover:scale-100 cursor-not-allowed';
-            } else if (isSelected) {
-              card.className += ' border-teal-400 border-2 shadow-[0_0_12px_rgba(45,212,191,0.6)] scale-105';
-            } else {
-              card.className += ' border-teal-500/25 ring-1 ring-teal-500/10 hover:border-teal-400';
-            }
-          } else {
-            card.className += ' opacity-50 cursor-not-allowed hover:scale-100';
-          }
-
-          pHandContainer.appendChild(card);
-        });
-      } else {
-        pHandContainer.innerHTML = `<div class="text-teal-500/50 italic text-sm p-4 w-full text-center font-mono">Plus aucun domino dans votre main !</div>`;
-      }
-
-      // Update Boneyard Count float elements
-      document.getElementById('boardTalonCount').innerText = boneyard.length;
-      document.getElementById('talonFloatBadge').innerText = boneyard.length;
-
-      // Show / Hide Force Pass or PIOCHE alert panel controls
-      const alertPanel = document.getElementById('playerControlsAlert');
-      const alertDesc = document.getElementById('alertDescription');
-      const alertBtn = document.getElementById('alertActionBtn');
-
-      if (!playerHasAnyPlay() && turn === 'player' && !aiThinking) {
-        alertPanel.classList.remove('hidden');
-        alertPanel.classList.add('flex');
-        
-        if (boneyard.length > 0) {
-          alertDesc.innerText = "La pioche contient encore des dominos, piochez-y pour trouver un domino jouable.";
-          alertBtn.innerText = "Piocher au Talon";
-          alertBtn.onclick = handlePlayerDraw;
-        } else {
-          alertDesc.innerText = "La pioche est vide et aucun coup n'est possible, vous devez passer.";
-          alertBtn.innerText = "Passer le Tour";
-          alertBtn.onclick = handlePlayerPass;
-        }
-      } else {
-        alertPanel.classList.add('hidden');
-        alertPanel.classList.remove('flex');
-      }
-
-      autoScrollBoardToCenter();
-    }
-
-    // Direct Placement for starting Double Domino
-    function placeStarterDirectlyPlayer(dominoId) {
-      const selected = playerHand.find(d => d.id === dominoId);
-      if (!selected) return;
-
-      const placed = {
-        id: selected.id,
-        value: selected.value,
-        arrangedValue: [...selected.value],
-        isDouble: selected.isDouble
-      };
-
-      board = [placed];
-      playerHand = playerHand.filter(d => d.id !== dominoId);
-      triggerSound('place');
-
-      addLog(`Vous débutez la partie en plaçant votre domino [${selected.value[0]}|${selected.value[1]}]`, 'player');
-
-      // Check immediate round end conditions, else proceed next
-      if (checkRoundEndConditions()) return;
-
-      selectedDominoId = null;
-      turn = 'computer';
-      updateUI();
-      setTimeout(triggerAiTurn, 1600);
-    }
-
-    // Place selected tile into left or right target zones
-    function placeSelectedTile(side) {
-      if (!selectedDominoId) return;
-      const selected = playerHand.find(d => d.id === selectedDominoId);
-      if (!selected) return;
-
-      const isLeft = side === 'left';
-      const anchorVal = isLeft ? board[0].arrangedValue[0] : board[board.length - 1].arrangedValue[1];
-
-      // Format correct orientation variables
-      let arranged = [...selected.value];
-      if (isLeft) {
-        // Matches left end
-        if (selected.value[1] === anchorVal) {
-          arranged = [selected.value[0], selected.value[1]];
-        } else if (selected.value[0] === anchorVal) {
-          arranged = [selected.value[1], selected.value[0]];
-        }
-      } else {
-        // Matches right end
-        if (selected.value[0] === anchorVal) {
-          arranged = [selected.value[0], selected.value[1]];
-        } else if (selected.value[1] === anchorVal) {
-          arranged = [selected.value[1], selected.value[0]];
-        }
-      }
-
-      const placed = {
-        id: selected.id,
-        value: selected.value,
-        arrangedValue: arranged,
-        isDouble: selected.isDouble
-      };
-
-      if (isLeft) {
-        board.unshift(placed);
-      } else {
-        board.push(placed);
-      }
-
-      playerHand = playerHand.filter(d => d.id !== selectedDominoId);
-      triggerSound('place');
-
-      addLog(`Vous placez le domino [${selected.value[0]}|${selected.value[1]}] à ${isLeft ? 'gauche' : 'droite'}`, 'player');
-
-      // Check immediate victory parameters
-      if (checkRoundEndConditions()) return;
-
-      selectedDominoId = null;
-      turn = 'computer';
-      updateUI();
-      setTimeout(triggerAiTurn, 1600);
-    }
-
-    // Perform draw visual action for player Hand
-    function handlePlayerDraw() {
-      if (turn !== 'player' || aiThinking) return;
-      if (playerHasAnyPlay()) {
-        addLog(`Vous ne pouvez pas piocher, vous possédez des coups valides !`, 'system');
-        showToast("Vous possédez des coups jouables");
-        return;
-      }
-
-      if (boneyard.length === 0) {
-        addLog(`La pioche est vide, vous devez passer votre tour !`, 'system');
-        return;
-      }
-
-      triggerSound('draw');
-      const drawn = boneyard.shift();
-      playerHand.push(drawn);
-      addLog(`Vous piochez le domino [${drawn.value[0]}|${drawn.value[1]}]`, 'player');
-
-      // If drawn can be instantly played, pre-select it
-      const playstate = checkIsPlayable(drawn);
-      if (playstate.any) {
-        selectedDominoId = drawn.id;
-        showToast("Domino jouable pioché !");
-      }
-
-      updateUI();
-    }
-
-    // Pass turn player action trigger
-    function handlePlayerPass() {
-      if (turn !== 'player' || aiThinking) return;
-      if (playerHasAnyPlay()) {
-         addLog(`Vous ne pouvez pas passer, des coups sont jouables !`, 'system');
-         return;
-      }
-      if (boneyard.length > 0) {
-        addLog(`Le talon contient des cartes, piochez avant de passer.`, 'system');
-        return;
-      }
-
-      addLog(`Vous passez votre tour.`, 'player');
-      turn = 'computer';
-      updateUI();
-      setTimeout(triggerAiTurn, 1600);
-    }
-
-    // Handles Scroll central chains to left or right sides
-    document.getElementById('scrollLeftBtn').addEventListener('click', () => {
-      triggerSound('click');
-      const boardChain = document.getElementById('boardChain');
-      boardChain.scrollBy({ left: -140, behavior: 'smooth' });
-    });
-
-    document.getElementById('scrollRightBtn').addEventListener('click', () => {
-      triggerSound('click');
-      const boardChain = document.getElementById('boardChain');
-      boardChain.scrollBy({ left: 140, behavior: 'smooth' });
-    });
-
-    function autoScrollBoardToCenter() {
-      const boardChain = document.getElementById('boardChain');
-      if (boardChain) {
-        setTimeout(() => {
-          boardChain.scrollTo({ left: boardChain.scrollWidth / 2 - boardChain.clientWidth / 2, behavior: 'smooth' });
-        }, 300);
-      }
-    }
-
-    // Core AI Opponent strategic actions & thinking sequence!
-    function triggerAiTurn() {
-      if (turn !== 'computer') return;
-      const currentOpponent = OPPONENTS[opponentIndex];
-      
-      aiThinking = true;
-      document.getElementById('aiThinkingStatus').innerText = `${currentOpponent.name} examine attentivement ses options...`;
-      updateUI();
-
-      let seconds = 0;
-      aiStatusInterval = setInterval(() => {
-        seconds++;
-        if (seconds === 1) {
-          document.getElementById('aiThinkingStatus').innerText = `${currentOpponent.name} évalue la table de jeu...`;
-        } else if (seconds === 2) {
-          document.getElementById('aiThinkingStatus').innerText = `${currentOpponent.name} prépare son coup...`;
-        }
-      }, 700);
-
-      setTimeout(() => {
-        clearInterval(aiStatusInterval);
-        
-        // Execute placement check
-        if (board.length === 0) {
-          // AI must play starter domino!
-          const starterIdx = computerHand.findIndex(d => d.id === starterDomino.id);
-          if (starterIdx !== -1) {
-            const selected = computerHand[starterIdx];
-            
-            const placed = {
-              id: selected.id,
-              value: selected.value,
-              arrangedValue: [...selected.value],
-              isDouble: selected.isDouble
+            const newPlaced = {
+              ...domino,
+              arrangedValue: [...domino.value],
+              position: 'first',
             };
-            
-            board = [placed];
-            computerHand = computerHand.filter(d => d.id !== selected.id);
-            triggerSound('place');
 
-            addLog(`${currentOpponent.name} entame le match avec le domino requis [${selected.value[0]}|${selected.value[1]}]`, 'computer');
-
-            aiThinking = false;
-            document.getElementById('aiThinkingStatus').innerText = "À vous de jouer !";
-            
-            if (checkRoundEndConditions()) return;
-
-            turn = 'player';
-            updateUI();
-          }
-          return;
-        }
-
-        // Standard AI turn choices
-        const playableOptions = computerHand.filter(d => checkIsPlayable(d).any);
-
-        if (playableOptions.length > 0) {
-          // Strategic selection: play highest points value or double
-          playableOptions.sort((a,b) => {
-            if (a.isDouble && !b.isDouble) return -1;
-            if (b.isDouble && !a.isDouble) return 1;
-            return (b.value[0] + b.value[1]) - (a.value[0] + a.value[1]);
-          });
-
-          const selected = playableOptions[0];
-          const spec = checkIsPlayable(selected);
-
-          // Select Side choice
-          let chosenSide = 'left';
-          if (spec.left && spec.right) {
-            // Pick side holding less points if possible or random
-            chosenSide = Math.random() > 0.5 ? 'left' : 'right';
-          } else if (spec.left) {
-            chosenSide = 'left';
-          } else {
-            chosenSide = 'right';
-          }
-
-          const isLeft = chosenSide === 'left';
-          const anchorVal = isLeft ? board[0].arrangedValue[0] : board[board.length - 1].arrangedValue[1];
-
-          let arranged = [...selected.value];
-          if (isLeft) {
-            if (selected.value[1] === anchorVal) {
-               arranged = [selected.value[0], selected.value[1]];
+            setBoard([newPlaced]);
+            if (isPlayer) {
+              setPlayerHand(prev => prev.filter(d => d.id !== dominoId));
             } else {
-               arranged = [selected.value[1], selected.value[0]];
+              setComputerHand(prev => prev.filter(d => d.id !== dominoId));
+            }
+
+            sounds.playTilePlace();
+            addLog(
+              `${isPlayer ? 'Vous avez' : "L'IA a"} ouvert l'arène de jeu avec le domino [${domino.value[0]}|${domino.value[1]}]`,
+              isPlayer ? 'player' : 'computer'
+            );
+
+            setSelectedDominoId(null);
+            afterTurnExecuted(isPlayer ? 'computer' : 'player', [newPlaced], isPlayer, dominoId);
+            return;
+          }
+
+          const { left: leftEnd, right: rightEnd } = getBoardEnds();
+          const [a, b] = domino.value;
+          let arranged = null;
+
+          if (side === 'left') {
+            if (b === leftEnd) {
+              arranged = [a, b];
+            } else if (a === leftEnd) {
+              arranged = [b, a];
             }
           } else {
-            if (selected.value[0] === anchorVal) {
-               arranged = [selected.value[0], selected.value[1]];
-            } else {
-               arranged = [selected.value[1], selected.value[0]];
+            if (a === rightEnd) {
+              arranged = [a, b];
+            } else if (b === rightEnd) {
+              arranged = [b, a];
             }
           }
 
-          const placed = {
-            id: selected.id,
-            value: selected.value,
+          if (!arranged) return;
+
+          const newPlaced = {
+            ...domino,
             arrangedValue: arranged,
-            isDouble: selected.isDouble
+            position: side,
           };
 
-          if (isLeft) {
-            board.unshift(placed);
+          const nextBoard = side === 'left' ? [newPlaced, ...board] : [...board, newPlaced];
+
+          setBoard(nextBoard);
+
+          if (isPlayer) {
+            setPlayerHand(prev => prev.filter(d => d.id !== dominoId));
           } else {
-            board.push(placed);
+            setComputerHand(prev => prev.filter(d => d.id !== dominoId));
           }
 
-          computerHand = computerHand.filter(d => d.id !== selected.id);
-          triggerSound('place');
+          sounds.playTilePlace();
+          addLog(
+            `${isPlayer ? 'Vous avez' : "L'IA a"} posé le domino [${domino.value[0]}|${domino.value[1]}] à ${side === 'left' ? 'gauche' : 'droite'}`,
+            isPlayer ? 'player' : 'computer'
+          );
 
-          addLog(`${currentOpponent.name} a posé le domino [${selected.value[0]}|${selected.value[1]}] à ${isLeft ? 'gauche' : 'droite'}`, 'computer');
+          setSelectedDominoId(null);
+          scrollBoard(side);
+          afterTurnExecuted(isPlayer ? 'computer' : 'player', nextBoard, isPlayer, dominoId);
+        };
 
-          aiThinking = false;
-          document.getElementById('aiThinkingStatus').innerText = "À votre tour !";
+        const afterTurnExecuted = (
+          nextTurn,
+          currentBoard,
+          justPlayedByPlayer,
+          playedDominoId,
+          wasPass = false
+        ) => {
+          const dId = wasPass ? null : (playedDominoId || selectedDominoId);
+          const currentHands = {
+            player: justPlayedByPlayer && dId ? playerHand.filter(d => d.id !== dId) : playerHand,
+            computer: !justPlayedByPlayer && dId ? computerHand.filter(d => d.id !== dId) : computerHand,
+          };
 
-          if (checkRoundEndConditions()) return;
+          if (justPlayedByPlayer && currentHands.player.length === 0) {
+            const points = calculateHandScore(currentHands.computer);
+            setTournamentPlayerScore(prev => prev + points);
+            setRoundGainedPoints(points);
+            setRoundWinner('player');
+            setVictory('player');
+            sounds.playSuccess();
+            addLog(`🎉 Félicitations, vous avez vidé votre main ! Vous marquez +${points} pts contre ${currentOpponent.name} !`, 'player');
+            setShowRoundPopup(true);
+            return;
+          }
+          if (!justPlayedByPlayer && currentHands.computer.length === 0) {
+            const points = calculateHandScore(currentHands.player);
+            setTournamentComputerScore(prev => prev + points);
+            setRoundGainedPoints(points);
+            setRoundWinner('computer');
+            setVictory('computer');
+            sounds.playFail();
+            addLog(`😢 ${currentOpponent.name} a vidé sa main et marque +${points} pts !`, 'computer');
+            setShowRoundPopup(true);
+            return;
+          }
 
-          turn = 'player';
-          updateUI();
+          const testPlayerPlayable = currentHands.player.some(d => {
+            if (currentBoard.length === 0 || !currentBoard[0] || !currentBoard[currentBoard.length - 1]) return true;
+            const left = currentBoard[0].arrangedValue[0];
+            const right = currentBoard[currentBoard.length - 1].arrangedValue[1];
+            const [a, b] = d.value;
+            return a === left || b === left || a === right || b === right;
+          });
 
-        } else {
-          // AI has no play options, try to draw from Talon boneyard if not empty
+          const testComputerPlayable = currentHands.computer.some(d => {
+            if (currentBoard.length === 0 || !currentBoard[0] || !currentBoard[currentBoard.length - 1]) return true;
+            const left = currentBoard[0].arrangedValue[0];
+            const right = currentBoard[currentBoard.length - 1].arrangedValue[1];
+            const [a, b] = d.value;
+            return a === left || b === left || a === right || b === right;
+          });
+
+          const isBoneyardEmpty = boneyard.length === 0;
+
+          if (!testPlayerPlayable && !testComputerPlayable && isBoneyardEmpty) {
+            const playerRestPoints = calculateHandScore(currentHands.player);
+            const computerRestPoints = calculateHandScore(currentHands.computer);
+
+            addLog(`Le jeu est complètement Bloqué ! Pioche vide et plus aucun coup possible.`, 'system');
+            addLog(`Calcul des scores finaux du round :`, 'system');
+            addLog(`- Vos points : ${playerRestPoints} pts`, 'player');
+            addLog(`- Points de ${currentOpponent.name} : ${computerRestPoints} pts`, 'computer');
+
+            if (playerRestPoints < computerRestPoints) {
+              const points = computerRestPoints;
+              setTournamentPlayerScore(prev => prev + points);
+              setRoundGainedPoints(points);
+              setRoundWinner('player');
+              setVictory('player');
+              sounds.playSuccess();
+              addLog(`🏆 Gagné ! Vous avez moins de points (${playerRestPoints} vs ${computerRestPoints}). Vous marquez +${points} pts !`, 'player');
+            } else if (computerRestPoints < playerRestPoints) {
+              const points = playerRestPoints;
+              setTournamentComputerScore(prev => prev + points);
+              setRoundGainedPoints(points);
+              setRoundWinner('computer');
+              setVictory('computer');
+              sounds.playFail();
+              addLog(`💻 Perdu ! ${currentOpponent.name} remporte la manche car elle a moins de points (${computerRestPoints} vs ${playerRestPoints}). Elle marque +${points} pts !`, 'computer');
+            } else {
+              setRoundGainedPoints(0);
+              setRoundWinner('draw');
+              setVictory('draw');
+              sounds.playSuccess();
+              addLog(`🤝 Égalité parfaite ! Les deux joueurs ont exactement ${playerRestPoints} points restants. Aucun point marqué.`, 'system');
+            }
+            setShowRoundPopup(true);
+            return;
+          }
+
+          setTurn(nextTurn);
+        };
+
+        const handlePlayerDraw = () => {
+          if (turn !== 'player' || victory || aiThinking) return;
+
+          if (playerHasAnyPlay()) {
+            addLog(`Impossible de piocher : vous avez des dominos jouables !`, 'system');
+            return;
+          }
+
+          if (boneyard.length === 0) {
+            addLog(`La pioche est vide ! Passez votre tour.`, 'system');
+            return;
+          }
+
+          sounds.playDraw();
+          const drawn = boneyard[0];
+          const newBoneyard = boneyard.slice(1);
+          const newHand = [...playerHand, drawn];
+
+          setBoneyard(newBoneyard);
+          setPlayerHand(newHand);
+
+          addLog(`Vous avez pioché le domino [${drawn.value[0]}|${drawn.value[1]}]`, 'player');
+
+          const playStatus = checkIsPlayable(drawn);
+          if (playStatus.any) {
+            setSelectedDominoId(drawn.id);
+          }
+        };
+
+        const handlePlayerPass = () => {
+          if (turn !== 'player' || victory || aiThinking) return;
+
+          if (playerHasAnyPlay()) {
+            addLog(`Sélectionnez un domino pour jouer : vous avez des coups possibles !`, 'system');
+            return;
+          }
+
           if (boneyard.length > 0) {
-            const drawn = boneyard.shift();
-            computerHand.push(drawn);
-            triggerSound('draw');
-
-            addLog(`${currentOpponent.name} n'a pas de coup possible et pioche au talon.`, 'computer');
-
-            // Quick auto retries turn to check if drawn fits
-            aiThinking = false;
-            triggerAiTurn();
-          } else {
-            // Talon empty, AI must Pass
-            addLog(`${currentOpponent.name} n'a aucune action possible et passe son tour.`, 'computer');
-            
-            aiThinking = false;
-            document.getElementById('aiThinkingStatus').innerText = `${currentOpponent.name} a passé son tour !`;
-            
-            turn = 'player';
-            updateUI();
+            addLog(`Vous ne pouvez pas passer : des dominos sont encore disponibles dans la pioche !`, 'system');
+            return;
           }
-        }
-      }, 1900);
-    }
 
-    // Action listener to reset the game round
-    document.getElementById('btnRestartMatch').addEventListener('click', () => {
-      triggerSound('click');
-      startNewMatch(opponentIndex);
-    });
+          addLog(`Vous passez votre tour.`, 'player');
+          afterTurnExecuted('computer', board, true, undefined, true);
+        };
 
-    // Start Championship on first page load!
-    window.addEventListener('load', () => {
-      startNewMatch(0);
-    });
-  </script>
-</body>
-  </html>
+        // Computer AI Logic hook
+        useEffect(() => {
+          if (turn !== 'computer' || victory || aiThinking) return;
+
+          let isSubscribed = true;
+
+          const executeAiStep = async () => {
+            setAiThinking(true);
+            setAiStatus(`${currentOpponent.name} examine son jeu...`);
+
+            await new Promise(resolve => setTimeout(resolve, 1400));
+            if (!isSubscribed) return;
+
+            if (board.length === 0) {
+              if (starterDomino) {
+                setAiStatus(`${currentOpponent.name} pose le domino de départ...`);
+                await new Promise(resolve => setTimeout(resolve, 800));
+                if (!isSubscribed) return;
+
+                const starterPlaced = {
+                  ...starterDomino,
+                  arrangedValue: [...starterDomino.value],
+                  position: 'first',
+                };
+
+                setBoard([starterPlaced]);
+                setComputerHand(prev => prev.filter(d => d.id !== starterDomino.id));
+                sounds.playTilePlace();
+                addLog(
+                  `${currentOpponent.name} entame l'arène avec le domino de départ [${starterDomino.value[0]}|${starterDomino.value[1]}]`,
+                  'computer'
+                );
+
+                setAiThinking(false);
+                setAiStatus('');
+                afterTurnExecuted('player', [starterPlaced], false, starterDomino.id);
+              }
+              return;
+            }
+
+            const playableOptions = computerHand.filter(d => checkIsPlayable(d).any);
+
+            if (playableOptions.length > 0) {
+              playableOptions.sort((x, y) => {
+                if (x.isDouble && !y.isDouble) return -1;
+                if (!x.isDouble && y.isDouble) return 1;
+                const sumX = x.value[0] + x.value[1];
+                const sumY = y.value[0] + y.value[1];
+                return sumY - sumX;
+              });
+
+              const selected = playableOptions[0];
+              const limits = checkIsPlayable(selected);
+
+              let chosenSide = 'right';
+              if (limits.left && limits.right) {
+                chosenSide = Math.random() > 0.5 ? 'left' : 'right';
+              } else if (limits.left) {
+                chosenSide = 'left';
+              }
+
+              setAiStatus(`${currentOpponent.name} s'apprête à jouer...`);
+              await new Promise(resolve => setTimeout(resolve, 600));
+              if (!isSubscribed) return;
+
+              const { left: leftEnd, right: rightEnd } = getBoardEnds();
+              const [a, b] = selected.value;
+              let arranged = [0, 0];
+
+              if (chosenSide === 'left') {
+                arranged = b === leftEnd ? [a, b] : [b, a];
+              } else {
+                arranged = a === rightEnd ? [a, b] : [b, a];
+              }
+
+              const newPlaced = {
+                ...selected,
+                arrangedValue: arranged,
+                position: chosenSide,
+              };
+
+              const nextBoard = chosenSide === 'left' ? [newPlaced, ...board] : [...board, newPlaced];
+
+              setBoard(nextBoard);
+              setComputerHand(prev => prev.filter(d => d.id !== selected.id));
+              sounds.playTilePlace();
+
+              addLog(
+                `${currentOpponent.name} a placé le domino [${selected.value[0]}|${selected.value[1]}] à ${chosenSide === 'left' ? 'gauche' : 'droite'}`,
+                'computer'
+              );
+
+              setAiThinking(false);
+              setAiStatus('');
+              scrollBoard(chosenSide);
+
+              afterTurnExecuted('player', nextBoard, false, selected.id);
+            } else {
+              if (boneyard.length > 0) {
+                setAiStatus(`Pas de coup possible. ${currentOpponent.name} pioche...`);
+                await new Promise(resolve => setTimeout(resolve, 1200));
+                if (!isSubscribed) return;
+
+                sounds.playDraw();
+                const drawnTile = boneyard[0];
+                setBoneyard(prev => prev.slice(1));
+                setComputerHand(prev => [...prev, drawnTile]);
+
+                addLog(`${currentOpponent.name} ne peut pas jouer et pioche un domino du talon.`, 'computer');
+
+                setAiThinking(false);
+                setAiStatus('');
+              } else {
+                setAiStatus(`Plus de dominos. ${currentOpponent.name} passe son tour.`);
+                await new Promise(resolve => setTimeout(resolve, 1400));
+                if (!isSubscribed) return;
+
+                addLog(`${currentOpponent.name} a passé son tour car le talon est vide et aucun coup n'est possible.`, 'computer');
+                setAiThinking(false);
+                setAiStatus('');
+                afterTurnExecuted('player', board, false, undefined, true);
+              }
+            }
+          };
+
+          executeAiStep();
+
+          return () => {
+            isSubscribed = false;
+          };
+        }, [turn, board.length, boneyard.length, victory]);
+
+        const handleTileClick = (domino) => {
+          if (turn !== 'player' || victory || aiThinking) return;
+
+          sounds.playClick();
+
+          if (board.length === 0 && starterDomino) {
+            if (domino.id !== starterDomino.id) {
+              addLog(
+                `Action bloquée ! Vous devez débuter la partie en jouant votre double le plus élevé : [${starterDomino.value[0]}|${starterDomino.value[1]}]`,
+                'system'
+              );
+              return;
+            }
+          }
+
+          const { any: isPlayable } = checkIsPlayable(domino);
+
+          if (!isPlayable) {
+            addLog(
+              `Ce domino [${domino.value[0]}|${domino.value[1]}] ne peut être placé sur aucun des cotés actifs du jeu !`,
+              'system'
+            );
+            return;
+          }
+
+          if (selectedDominoId === domino.id) {
+            setSelectedDominoId(null);
+          } else {
+            setSelectedDominoId(domino.id);
+
+            const spec = checkIsPlayable(domino);
+            if (board.length === 0) {
+              handlePlaceDomino(domino.id, 'right');
+            } else if (spec.left && !spec.right) {
+              handlePlaceDomino(domino.id, 'left');
+            } else if (spec.right && !spec.left) {
+              handlePlaceDomino(domino.id, 'right');
+            }
+          }
+        };
+
+        const handleDragStart = (e, id) => {
+          if (turn !== 'player' || victory || aiThinking) {
+            e.preventDefault();
+            return;
+          }
+          const domino = playerHand.find(d => d.id === id);
+          if (!domino) return;
+
+          const { any } = checkIsPlayable(domino);
+          if (!any) {
+            e.preventDefault();
+            return;
+          }
+
+          setSelectedDominoId(id);
+          e.dataTransfer.setData('text/plain', id);
+        };
+
+        const handleDrop = (e, side) => {
+          e.preventDefault();
+          setIsDraggedOverLeft(false);
+          setIsDraggedOverRight(false);
+
+          const matchId = e.dataTransfer.getData('text/plain') || selectedDominoId;
+          if (matchId) {
+            const domino = playerHand.find(d => d.id === matchId);
+            if (domino) {
+              const spec = checkIsPlayable(domino);
+              if ((side === 'left' && spec.left) || (side === 'right' && spec.right)) {
+                handlePlaceDomino(matchId, side);
+              }
+            }
+          }
+        };
+
+        const getSelectedPlayableSpec = () => {
+          if (!selectedDominoId) return { left: false, right: false };
+          const selectedObj = playerHand.find(d => d.id === selectedDominoId);
+          if (!selectedObj) return { left: false, right: false };
+          return checkIsPlayable(selectedObj);
+        };
+
+        const selectedSpec = getSelectedPlayableSpec();
+
+        return (
+          <div className="min-h-screen immersive-bg text-slate-100 flex flex-col font-sans select-none overflow-x-hidden pb-6">
+            <header className="immersive-header py-3.5 px-4 md:px-8 flex flex-wrap justify-between items-center gap-4 sticky top-0 z-20">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#2dd4bf] to-teal-700 border-2 border-slate-900 shadow-md flex items-center justify-center font-black text-slate-950 font-mono text-xl rotate-12">
+                  ::
+                </div>
+                <div>
+                  <h1 className="text-xl md:text-2xl font-black tracking-tight text-[#2dd4bf] drop-shadow flex items-center gap-2">
+                    Droppex Dominoes <span className="text-xs bg-teal-950/60 text-teal-300 font-bold px-2 py-0.5 rounded-full border border-teal-400/20">Tournoi</span>
+                  </h1>
+                  <p className="text-xs text-teal-200/70 font-medium">Jeu intelligent de domino Double-Six</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={toggleMuted}
+                  className="p-2.5 rounded-xl bg-black/40 border-2 border-[#2dd4bf]/30 hover:bg-[#2dd4bf]/10 active:scale-95 transition-all text-slate-200"
+                  title="Sons On/Off"
+                >
+                  {mutedState ? <Icons.VolumeX /> : <Icons.Volume2 />}
+                </button>
+
+                <button
+                  onClick={() => {
+                    sounds.playClick();
+                    setShowRules(true);
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-black/40 border-2 border-[#2dd4bf]/30 hover:bg-[#2dd4bf]/10 active:scale-95 transition-all font-bold text-sm flex items-center gap-2 text-[#2dd4bf]"
+                >
+                  <Icons.HelpCircle />
+                  <span className="hidden sm:inline">Règles</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    sounds.playClick();
+                    startNewMatch(opponentIndex);
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-teal-400 to-teal-600 hover:from-teal-300 hover:to-teal-500 text-slate-950 font-black text-sm active:translate-y-px transition-all shadow-lg border-2 border-slate-900 flex items-center gap-2"
+                >
+                  <Icons.RotateCcw />
+                  <span>Rejouer</span>
+                </button>
+              </div>
+            </header>
+
+            <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 mt-3">
+              <div className="immersive-panel rounded-2xl p-3 sm:p-4 bg-gradient-to-r from-teal-950/70 via-[#0a2e2c]/90 to-teal-950/70 border border-[#2dd4bf]/20 shadow-md flex flex-col md:flex-row justify-between items-center gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl sm:text-4xl filter drop-shadow">{currentOpponent.flag}</span>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[9px] font-black text-teal-300 tracking-wider uppercase bg-teal-950/60 px-2 py-0.5 rounded border border-teal-400/20 leading-none">FACE À :</span>
+                      <span className="text-[11px] text-teal-200/60 font-medium italic">{currentOpponent.desc}</span>
+                    </div>
+                    <h2 className="text-base sm:text-lg font-black text-slate-100 flex items-center gap-2 leading-tight mt-1">
+                      {currentOpponent.name} <span className="text-teal-450 font-mono text-xs">({currentOpponent.country})</span>
+                    </h2>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 w-full md:w-auto">
+                  <div className="text-center bg-black/30 border border-white/5 px-3 py-1.5 rounded-xl shrink-0">
+                    <p className="text-[9px] font-bold text-teal-300/50 uppercase leading-none pb-0.5">MANCHE</p>
+                    <p className="text-xs font-mono font-black text-[#2dd4bf]">ROUND {roundNumber} <span className="text-[9px] text-teal-400 font-normal">/ 12</span></p>
+                  </div>
+
+                  <div className="flex items-center gap-3.5 bg-black/45 px-4 py-2 rounded-2xl border-2 border-[#2dd4bf]/25 shadow-inner relative overflow-hidden shrink-0">
+                    <div className="flex flex-col items-center">
+                      <p className="text-[9px] font-bold text-[#2dd4bf]/80 uppercase leading-none pb-0.5">Vous</p>
+                      <p className="text-xl font-mono font-black text-[#2dd4bf]">
+                        {tournamentPlayerScore} <span className="text-[10px] text-[#2dd4bf]/70 font-normal">pts</span>
+                      </p>
+                    </div>
+
+                    <div className="text-center flex flex-col items-center mx-1 select-none">
+                      <span className="bg-[#211]/30 text-rose-400 border border-rose-500/30 text-[9px] font-black px-1.5 rounded-md leading-normal select-none">VS</span>
+                      <span className="text-[8px] font-semibold text-slate-400 mt-0.5 leading-none">Cible: 100</span>
+                    </div>
+
+                    <div className="flex flex-col items-center">
+                      <p className="text-[9px] font-bold text-rose-300 uppercase leading-none pb-0.5">{currentOpponent.name}</p>
+                      <p className="text-xl font-mono font-black text-rose-400">
+                        {tournamentComputerScore} <span className="text-[10px] text-rose-400/70 font-normal">pts</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="hidden lg:flex flex-col gap-1 w-32 justify-center">
+                    <div className="flex justify-between text-[8px] font-bold text-slate-400 leading-none">
+                      <span>Vous: {tournamentPlayerScore}%</span>
+                      <span>{currentOpponent.name}: {tournamentComputerScore}%</span>
+                    </div>
+                    <div className="w-full h-2 rounded bg-black/40 overflow-hidden border border-white/5 flex">
+                      <div style={{ width: `${Math.min(100, tournamentPlayerScore)}%` }} className="h-full bg-gradient-to-r from-teal-500 to-[#2dd4bf] transition-all duration-500" />
+                      <div style={{ width: `${Math.min(100, tournamentComputerScore)}%` }} className="h-full bg-gradient-to-r from-rose-500 to-rose-400 transition-all duration-500 ml-auto" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <main className="flex-1 w-full max-w-7xl mx-auto p-2 sm:p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-4 gap-3.5 sm:gap-6">
+              <div className="lg:col-span-3 flex flex-col gap-3.5 sm:gap-6">
+                
+                {/* Tournament Rival */}
+                <div className="immersive-panel rounded-3xl p-3 sm:p-4 relative overflow-hidden shadow-xl">
+                  <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-rose-500/10 border border-rose-500/30 px-2.5 py-0.5 sm:py-1 rounded-full text-rose-400 text-[10px] sm:text-xs font-bold font-mono">
+                    <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping absolute" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500 relative" />
+                    <span>OPPOSANT DU TOURNOI</span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-teal-950 border-2 border-[#2dd4bf]/40 flex items-center justify-center font-black text-slate-100 text-xl sm:text-2xl shadow-inner relative shrink-0">
+                      <span className="text-xl sm:text-2xl filter drop-shadow">{currentOpponent.flag}</span>
+                      {aiThinking && (
+                        <span className="absolute -top-1.5 -right-1.5 bg-[#2dd4bf] text-[#042f2e] font-bold text-[9px] px-1.5 py-0.5 rounded-full animate-bounce border border-[#042f2e]">
+                          ...
+                        </span>
+                      )}
+                    </div>
+
+                    <div>
+                      <h3 className="font-black text-slate-50 text-sm sm:text-base flex items-center gap-2 leading-tight">
+                        {currentOpponent.name}
+                        <span className="bg-black/30 text-[#2dd4bf] font-mono text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-bold">
+                          {computerHand.length} {computerHand.length > 1 ? 'dominos' : 'domino'}
+                        </span>
+                      </h3>
+                      <p className="text-[11px] sm:text-xs text-teal-200/60 font-medium">
+                        {aiThinking ? (
+                          <span className="text-[#2dd4bf] italic font-semibold">{aiStatus || 'Réfléchit...'}</span>
+                        ) : turn === 'computer' ? (
+                          'Analyse les possibilités...'
+                        ) : (
+                          'En attente de votre coup...'
+                        )}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-2.5 flex -space-x-3 sm:-space-x-2 items-center p-2 rounded-2xl bg-black/20 border-2 border-white/5 min-h-[60px] sm:min-h-[85px] justify-start overflow-x-auto">
+                    {computerHand.map((dom) => (
+                      <div key={dom.id} className="transition-all duration-300 transform scale-75 sm:scale-95 origin-center shrink-0 relative">
+                        <DominoTile domino={dom} isFaceDown={true} size="compact" />
+                      </div>
+                    ))}
+                    {computerHand.length === 0 && (
+                      <div className="text-xs text-teal-500/80 italic p-2">Le jeu est vide</div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Central Felt Arena Board */}
+                <div className="flex-1 min-h-[220px] sm:min-h-[340px] bg-gradient-to-b from-[#115e59] to-[#042f2e] rounded-3xl border-4 border-[#2dd4bf]/30 shadow-[inset_0_4px_16px_rgba(0,0,0,0.6),0_12px_24px_rgba(0,0,0,0.4)] p-3 sm:p-4 flex flex-col justify-between relative overflow-hidden">
+                  <div className="absolute inset-0 opacity-5 pointer-events-none bg-[radial-gradient(circle_at_center,#ffffff_1.2px,transparent_1.2px)] [background-size:24px_24px]" />
+                  <div className="absolute inset-x-0 top-0 h-1 bg-teal-950/40" />
+
+                  <div className="w-full flex justify-between items-center z-10 px-1 gap-2">
+                    <div className="shrink-0">
+                      {turn === 'player' ? (
+                        <div className="bg-teal-500/10 border border-[#2dd4bf]/45 text-[#2dd4bf] font-black px-3 py-1 rounded-xl text-[10px] sm:text-xs flex items-center gap-1.5 shadow-sm backdrop-blur-sm tracking-wide">
+                          <Icons.Sparkles />
+                          <span>À VOTRE TOUR !</span>
+                        </div>
+                      ) : (
+                        <div className="bg-amber-400/10 border border-amber-400/40 text-amber-300 font-bold px-3 py-1 rounded-xl text-[10px] sm:text-xs flex items-center gap-1.5 shadow-sm backdrop-blur-sm tracking-wide">
+                          <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+                          <span>IA EN COURS...</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="shrink-0">
+                      {boneyard.length > 0 ? (
+                        <button
+                          onClick={() => {
+                            if (!playerHasAnyPlay() && turn === 'player' && !aiThinking && !victory) {
+                              sounds.playClick();
+                              handlePlayerDraw();
+                            } else if (turn === 'player') {
+                              addLog(`Vous ne pouvez pas piocher : vous avez des coups possibles en main !`, 'system');
+                            }
+                          }}
+                          className={`flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-mono font-bold transition-all border select-none cursor-pointer ${
+                            turn === 'player' && !playerHasAnyPlay() && !aiThinking && !victory
+                              ? 'bg-[#2dd4bf] text-slate-950 border-teal-300 animate-bounce ring-2 ring-[#2dd4bf]/50 shadow-[0_0_12px_rgba(45,212,191,0.5)]'
+                              : 'bg-black/40 border-white/10 text-teal-300 hover:bg-black/60'
+                          }`}
+                        >
+                          <span>🂱 Talon:</span>
+                          <span className="font-mono bg-black/30 text-[#2dd4bf] px-1 rounded font-black">
+                            {boneyard.length}
+                          </span>
+                        </button>
+                      ) : (
+                        <span className="text-[10px] text-teal-500/60 bg-black/25 px-2.5 py-1 rounded-xl border border-white/5 font-mono">
+                          Talon vide
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="my-auto w-full relative">
+                    <div
+                      ref={boardScrollRef}
+                      className="flex items-center gap-1.5 p-4 sm:p-6 overflow-x-auto min-h-[120px] sm:min-h-[170px] transition-all duration-300 snap-x justify-start md:justify-center items-center"
+                    >
+                      {board.length > 0 && selectedSpec.left && turn === 'player' && (
+                        <div
+                          onClick={() => handlePlaceDomino(selectedDominoId, 'left')}
+                          className="snap-center mr-1 relative cursor-pointer"
+                        >
+                          <DominoTile domino={board[0]} isGhost={true} orientation="vertical" size="board" />
+                          <div
+                            onDragOver={(e) => {
+                              e.preventDefault();
+                              setIsDraggedOverLeft(true);
+                            }}
+                            onDragLeave={() => setIsDraggedOverLeft(false)}
+                            onDrop={(e) => handleDrop(e, 'left')}
+                            className={`absolute inset-0 rounded-2xl transition-all duration-200 border-2 border-dashed ${
+                              isDraggedOverLeft ? 'bg-teal-400/40 scale-105 border-teal-300' : 'bg-transparent border-transparent'
+                            }`}
+                          />
+                          <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-slate-950 border border-[#2dd4bf]/60 px-1.5 py-0.5 rounded text-[10px] text-[#2dd4bf] font-bold whitespace-nowrap shadow">
+                            {"<- Placer ici"}
+                          </div>
+                        </div>
+                      )}
+
+                      {board.length === 0 && (
+                        <div className="flex flex-col items-center justify-center gap-2 py-4 text-center mx-auto snap-center">
+                          <div className="w-20 h-10 border-2 border-dashed border-[#2dd4bf]/40 bg-[#2dd4bf]/5 rounded-2xl flex items-center justify-center animate-pulse">
+                            <Icons.Plus />
+                          </div>
+                          <div>
+                            <p className="text-[#2dd4bf] font-black text-xs sm:text-sm tracking-wide">L'ARÈNE EST PRÊTE !</p>
+                            <p className="text-teal-200/60 text-[10px] sm:text-xs mt-1 max-w-xs">
+                              {turn === 'player'
+                                ? `Sélectionnez le domino requis pour débuter la partie.`
+                                : `L'IA s'apprête à jouer son domino de départ.`}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {board.map((placed) => (
+                        <div key={placed.id} className="snap-center transform transition-all duration-300 scale-90 sm:scale-100">
+                          <DominoTile
+                            domino={{ id: placed.id, value: placed.arrangedValue, isDouble: placed.isDouble }}
+                            orientation={placed.isDouble ? 'vertical' : 'horizontal'}
+                            size="board"
+                          />
+                        </div>
+                      ))}
+
+                      {board.length > 0 && selectedSpec.right && turn === 'player' && (
+                        <div
+                          onClick={() => handlePlaceDomino(selectedDominoId, 'right')}
+                          className="snap-center ml-1 relative cursor-pointer"
+                        >
+                          <DominoTile domino={board[board.length - 1]} isGhost={true} orientation="vertical" size="board" />
+                          <div
+                            onDragOver={(e) => {
+                              e.preventDefault();
+                              setIsDraggedOverRight(true);
+                            }}
+                            onDragLeave={() => setIsDraggedOverRight(false)}
+                            onDrop={(e) => handleDrop(e, 'right')}
+                            className={`absolute inset-0 rounded-2xl transition-all duration-200 border-2 border-dashed ${
+                              isDraggedOverRight ? 'bg-teal-400/40 scale-105 border-teal-300' : 'bg-transparent border-transparent'
+                            }`}
+                          />
+                          <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-slate-950 border border-[#2dd4bf]/60 px-1.5 py-0.5 rounded text-[10px] text-[#2dd4bf] font-bold whitespace-nowrap shadow">
+                            {"Placer ici ->"}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="w-full flex justify-between items-center z-10 px-1 mt-auto gap-2">
+                    <div className="flex flex-col text-left">
+                      <span className="text-[10px] sm:text-[11px] text-[#2dd4bf] font-bold tracking-wider uppercase font-mono leading-tight">
+                        {board.length > 0 ? `Bord actif: [${board[0].arrangedValue[0]}] ••• [${board[board.length - 1].arrangedValue[1]}]` : 'Aucun domino sur la table'}
+                      </span>
+                      {logs.length > 0 && (
+                        <span className="text-[9px] font-mono text-teal-300/50 truncate max-w-[200px] sm:max-w-md hidden sm:inline-block leading-tight mt-0.5">
+                          Dernière action: {logs[logs.length - 1].text}
+                        </span>
+                      )}
+                    </div>
+
+                    {board.length > 3 && (
+                      <div className="flex gap-1.5 shrink-0">
+                        <button
+                          onClick={() => {
+                            sounds.playClick();
+                            scrollBoard('left');
+                          }}
+                          className="p-1 px-2.5 text-[10px] sm:text-xs font-semibold bg-black/40 hover:bg-black/60 border border-[#2dd4bf]/20 rounded-lg text-[#2dd4bf] flex items-center gap-0.5 select-none cursor-pointer"
+                        >
+                          <Icons.ChevronLeft />
+                          Gauche
+                        </button>
+                        <button
+                          onClick={() => {
+                            sounds.playClick();
+                            scrollBoard('right');
+                          }}
+                          className="p-1 px-2.5 text-[10px] sm:text-xs font-semibold bg-black/40 hover:bg-black/60 border border-[#2dd4bf]/20 rounded-lg text-[#2dd4bf] flex items-center gap-0.5 select-none cursor-pointer"
+                        >
+                          Droite
+                          <Icons.ChevronRight />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Deck Player */}
+                <div className="immersive-panel rounded-3xl p-3 sm:p-4 relative shadow-md">
+                  <div className="absolute top-2 right-2 flex items-center gap-1 bg-teal-500/10 border border-teal-500/30 px-3 py-1 rounded-full text-[#2dd4bf] text-[10px] sm:text-xs font-bold font-mono">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#2dd4bf]" />
+                    <span>VOTRE MAIN (JOUEUR)</span>
+                  </div>
+
+                  <div className="mb-2 sm:mb-4">
+                    <h3 className="font-black text-slate-50 text-sm sm:text-base flex items-center gap-2 leading-tight">
+                      Vos Dominos
+                      <span className="bg-black/30 text-[#2dd4bf] font-mono text-xs px-2 py-0.5 rounded-full font-bold">
+                        {playerHand.length}
+                      </span>
+                    </h3>
+                    <p className="text-[11px] sm:text-xs text-teal-200/60 leading-normal">
+                      {playerHasAnyPlay()
+                        ? 'Cliquez sur un domino pour le poser ou glissez-le sur la table.'
+                        : boneyard.length > 0
+                        ? 'Aucun coup possible ! Vous devez piocher dans le talon.'
+                        : 'Aucun coup possible et la pioche est vide ! Passez votre tour.'}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2.5 p-2 sm:p-3.5 rounded-2xl bg-black/25 border-2 border-white/5 min-h-[110px] sm:min-h-[140px] items-center justify-start overflow-x-auto">
+                    {playerHand.map((dom) => {
+                      const spec = checkIsPlayable(dom);
+                      const isSelected = selectedDominoId === dom.id;
+                      const isHighlighted = turn === 'player' && spec.any && !aiThinking;
+
+                      return (
+                        <div key={dom.id} className="transform scale-90 sm:scale-100 origin-center shrink-0">
+                          <DominoTile
+                            domino={dom}
+                            orientation="vertical"
+                            size="hand"
+                            isPlayable={isHighlighted && !isSelected}
+                            isSelected={isSelected}
+                            onClick={() => handleTileClick(dom)}
+                            draggable={isHighlighted}
+                            onDragStart={(e) => handleDragStart(e, dom.id)}
+                          />
+                        </div>
+                      );
+                    })}
+                    {playerHand.length === 0 && (
+                      <div className="text-teal-500/80 italic text-sm p-4 w-full text-center">Plus aucun domino !</div>
+                    )}
+                  </div>
+
+                  {!playerHasAnyPlay() && turn === 'player' && !aiThinking && !victory && (
+                    <div className="mt-3 flex items-center justify-between p-2.5 rounded-2xl bg-teal-500/10 border-2 border-[#2dd4bf]/35 text-teal-200">
+                      <div className="flex items-center gap-2">
+                        <Icons.AlertCircle />
+                        <div>
+                          <p className="text-[11px] sm:text-xs font-black">AUCUN COUP POSSIBLE !</p>
+                          <p className="text-[9px] sm:text-[10px] text-teal-200/60 font-medium">
+                            {boneyard.length > 0 ? "Le talon contient encore des dominos, piochez-y." : "La pioche est vide, vous devez passer."}
+                          </p>
+                        </div>
+                      </div>
+
+                      {boneyard.length > 0 ? (
+                        <button
+                          onClick={handlePlayerDraw}
+                          className="px-4 py-2 bg-teal-400 hover:bg-teal-300 text-slate-950 font-black rounded-xl text-xs shadow-md transition-all uppercase cursor-pointer"
+                        >
+                          Piocher au talon
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handlePlayerPass}
+                          className="bg-red-500/20 border border-red-500/40 hover:bg-red-600 hover:text-white text-rose-400 font-black px-4 py-2 rounded-xl text-xs shadow-md transition-all uppercase cursor-pointer"
+                        >
+                          Passer le tour
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Sidebar Info/Status column */}
+              <div className="hidden lg:flex flex-col gap-4 sm:gap-6">
+                
+                {/* Talon view */}
+                <div className="immersive-panel rounded-3xl p-4 flex flex-col justify-between shadow-md h-[180px] sm:h-[220px]">
+                  <div>
+                    <h3 className="font-black text-slate-50 text-sm flex items-center justify-between">
+                      <span>Le Talon (Pioche)</span>
+                      <span className="font-mono text-xs text-[#2dd4bf] bg-black/30 px-2 py-0.5 rounded-full border border-[#2dd4bf]/20">
+                        {boneyard.length} restants
+                      </span>
+                    </h3>
+                    <p className="text-teal-200/60 text-[11px] mt-1">Sert de réserve de pièces lorsqu'un joueur n'a aucun domino valide en main.</p>
+                  </div>
+
+                  <div className="flex justify-center items-center py-2 h-24">
+                    {boneyard.length > 0 ? (
+                      <div
+                        onClick={handlePlayerDraw}
+                        className={`group relative cursor-pointer select-none transition-transform active:scale-95 hover:scale-105 ${
+                          turn === 'player' && !playerHasAnyPlay() && !aiThinking && !victory
+                            ? 'ring-4 ring-[#2dd4bf] playable-tile-glow rounded-2xl animate-bounce'
+                            : ''
+                        }`}
+                      >
+                        {boneyard.length > 2 && (
+                          <div className="absolute top-[4px] left-[4px] pointer-events-none opacity-50 transform rotate-[3deg]">
+                            <DominoTile domino={boneyard[2]} isFaceDown={true} size="compact" />
+                          </div>
+                        )}
+                        {boneyard.length > 1 && (
+                          <div className="absolute top-[2px] left-[2px] pointer-events-none opacity-75 transform rotate-[-2deg]">
+                            <DominoTile domino={boneyard[1]} isFaceDown={true} size="compact" />
+                          </div>
+                        )}
+                        <DominoTile domino={boneyard[0]} isFaceDown={true} size="compact" />
+
+                        <div className="absolute -bottom-2 -right-2 bg-[#042f2e] text-[#2dd4bf] text-[10px] font-black w-6 h-6 rounded-full flex items-center justify-center border border-[#2dd4bf]/40 shadow-md">
+                          {boneyard.length}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="w-full h-full rounded-2xl border-2 border-dashed border-[#2dd4bf]/20 flex flex-col items-center justify-center text-teal-450 font-semibold text-xs gap-1">
+                        <span>Talon Vide</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Activity Logs Console */}
+                <div className="immersive-panel-dark rounded-3xl p-4 flex-1 flex flex-col justify-between shadow-md min-h-[220px]">
+                  <div>
+                    <h3 className="font-black text-slate-50 text-sm flex items-center gap-2">
+                      <Icons.History />
+                      <span>Journal de Jeu</span>
+                    </h3>
+                  </div>
+
+                  <div className="my-3 flex-1 overflow-y-auto max-h-[180px] sm:max-h-[240px] bg-black/40 rounded-2xl p-3 border border-white/5 font-mono text-[11px] leading-relaxed select-text select-all">
+                    {logs.map((log) => {
+                      const colors = {
+                        player: 'text-[#2dd4bf] font-medium',
+                        computer: 'text-teal-300 font-medium',
+                        system: 'text-emerald-400 font-bold',
+                      };
+
+                      return (
+                        <div key={log.id} className="mb-2 border-b border-[#2dd4bf]/10 pb-1 flex flex-col">
+                          <span className="text-[9px] text-teal-500/70">{log.timestamp}</span>
+                          <span className={colors[log.type]}>{log.text}</span>
+                        </div>
+                      );
+                    })}
+                    {logs.length === 0 && (
+                      <div className="text-teal-600/60 italic text-center py-8">Aucune action enregistrée</div>
+                    )}
+                    <div ref={logsEndRef} />
+                  </div>
+
+                  <div className="text-[10px] text-teal-200/60 bg-black/30 p-2 rounded-xl text-center border border-white/5">
+                    <span className="font-bold text-[#2dd4bf]">Astuce :</span> Cliquer ou faire glisser (drag'n'drop) vos dominos aux extrémités.
+                  </div>
+                </div>
+              </div>
+            </main>
+
+            {/* Rules overlay details Modal */}
+            {showRules && (
+              <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                <div className="bg-[#134e4a] border-2 border-[#2dd4bf] rounded-3xl max-w-lg w-full p-6 text-slate-100 relative shadow-2xl">
+                  <h2 className="text-xl font-black text-[#2dd4bf] flex items-center gap-2 border-b border-[#2dd4bf]/20 pb-3">
+                    <Icons.HelpCircle />
+                    <span>Règles du Domino Classique</span>
+                  </h2>
+
+                  <div className="mt-4 space-y-3.5 text-xs overflow-y-auto max-h-[380px] pr-1">
+                    <p>
+                      Le jeu de domino se joue ici dans sa variante <strong>Double-Six</strong>, soit un ensemble de 28 pièces comprenant des valeurs allant de 0 (blanc) à 6.
+                    </p>
+
+                    <div>
+                      <h4 className="font-bold text-[#2dd4bf] flex items-center gap-1.5"><Icons.Play />Distribution et Début</h4>
+                      <ul className="list-disc pl-5 mt-1 space-y-1 text-slate-300">
+                        <li>Chaque joueur reçoit <strong>7 dominos</strong> au hasard. Le reliquat forme le <strong>talon</strong> (pioche).</li>
+                        <li>Le joueur détenant le <strong>double le plus élevé</strong> (ex: [6,6], [5,5], etc.) entame obligatoirement la partie avec.</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <h4 className="font-bold text-[#2dd4bf] flex items-center gap-1.5"><Icons.ArrowRightLeft />Déroulement du Tour</h4>
+                      <ul className="list-disc pl-5 mt-1 space-y-1 text-slate-300">
+                        <li>À votre tour, vous devez poser un domino dont l'une des moitiés a le même chiffre qu'une extrémité libre sur la table.</li>
+                        <li>Les doubles se positionnent verticalement pour le plaisir des yeux !</li>
+                        <li>Si vous n'avez aucun domino compatible, vous devez <strong>piocher (Talon)</strong> jusqu'à en tirer un jouable. Si la pioche est vide, vous devez obligatoirement <strong>Passer</strong>.</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <h4 className="font-bold text-[#2dd4bf] flex items-center gap-1.5"><Icons.Check />Fin de Partie (Conditions d'arrêt)</h4>
+                      <ul className="list-disc pl-5 mt-1 space-y-1 text-slate-300">
+                        <li><strong>Dominos épuisés :</strong> Un joueur place son dernier domino et remporte immédiatement la manche !</li>
+                        <li><strong>Jeu Bloqué :</strong> Plus aucun joueur ne dispose de coup valide et le talon est vide. Dans cette situation, le joueur avec le <strong>moins de points</strong> restants gagne la partie et marque la somme de tous les points de l'adversaire.</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 pt-3 border-t border-[#2dd4bf]/20 flex justify-end">
+                    <button
+                      onClick={() => {
+                        sounds.playClick();
+                        setShowRules(false);
+                      }}
+                      className="px-5 py-2.5 bg-teal-400 text-slate-950 font-black rounded-xl text-xs uppercase cursor-pointer"
+                    >
+                      J'ai compris !
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Round completion Modal */}
+            {showRoundPopup && (
+              <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 z-50">
+                <div className="bg-[#0f3d3a] border-2 border-[#2dd4bf] rounded-3xl max-w-md w-full p-6 text-center shadow-2xl relative overflow-hidden">
+                  <div className="text-xs font-black text-teal-450 tracking-wider uppercase mb-2">
+                    FIN DE MANCHE — ROUND {roundNumber} / 12
+                  </div>
+
+                  {roundWinner === 'player' ? (
+                    <div className="flex flex-col items-center">
+                      <div className="w-14 h-14 rounded-full bg-teal-500/20 border-2 border-teal-400/60 flex items-center justify-center mb-3">
+                        <Icons.Trophy />
+                      </div>
+                      <h3 className="text-xl font-black text-[#2dd4bf] leading-tight">
+                        Manche pour vous !
+                      </h3>
+                      <p className="text-xs text-teal-100/70 mt-2 leading-relaxed">
+                        Vous remportez ce round et récupérez les points des dominos restants dans la main de {currentOpponent.name}.
+                      </p>
+                      <div className="mt-4 px-4 py-2 rounded-xl bg-teal-950/60 border border-[#2dd4bf]/20 text-sm font-mono font-black text-[#2dd4bf]">
+                        Score du round : +{roundGainedPoints} points !
+                      </div>
+                    </div>
+                  ) : roundWinner === 'computer' ? (
+                    <div className="flex flex-col items-center">
+                      <div className="w-14 h-14 rounded-full bg-rose-500/20 border-2 border-rose-400/50 flex items-center justify-center mb-3">
+                        <span className="text-2xl">{currentOpponent.flag}</span>
+                      </div>
+                      <h3 className="text-xl font-black text-rose-400 leading-tight">
+                        Manche pour {currentOpponent.name}
+                      </h3>
+                      <p className="text-xs text-rose-100/70 mt-2 leading-relaxed">
+                        Votre adversaire remporte ce round et récupère les points de vos dominos restants.
+                      </p>
+                      <div className="mt-4 px-4 py-2 rounded-xl bg-rose-955/40 border border-rose-500/20 text-sm font-mono font-black text-rose-400">
+                        Score du round : +{roundGainedPoints} points !
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center">
+                      <div className="w-14 h-14 rounded-full bg-slate-500/20 border-2 border-slate-400/50 flex items-center justify-center mb-3">
+                        <span className="text-2xl">🤝</span>
+                      </div>
+                      <h3 className="text-xl font-black text-slate-200 leading-tight">
+                        Bloqué : Égalité !
+                      </h3>
+                      <p className="text-xs text-slate-100/70 mt-2 leading-relaxed">
+                        Les deux jeux ont été bloqués avec exactement la même valeur de points restants. Aucun point n'est marqué.
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="mt-5 p-3 rounded-xl bg-black/40 border border-white/5 grid grid-cols-2 gap-2 text-center text-xs">
+                    <div className="border-r border-white/5">
+                      <span className="text-[10px] text-teal-300/60 block uppercase">Vos points restants</span>
+                      <span className="font-mono text-base font-black text-teal-100">
+                        {calculateHandScore(playerHand)} pts
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-teal-300/60 block uppercase">Points restants IA</span>
+                      <span className="font-mono text-base font-black text-teal-100">
+                        {calculateHandScore(computerHand)} pts
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 pt-4 border-t border-white/10">
+                    <p className="text-[10px] font-black text-teal-200/50 uppercase tracking-widest text-center mb-2.5">
+                      TABLEAU DES SCORES CUMULÉS
+                    </p>
+                    <div className="flex justify-between items-center bg-black/30 p-2.5 rounded-xl border border-[#2dd4bf]/10">
+                      <div className="text-left">
+                        <span className="text-[9px] text-[#2dd4bf]/70 font-bold block uppercase leading-none">VOUS</span>
+                        <span className="text-base font-mono font-black text-[#2dd4bf]">{tournamentPlayerScore} <span className="text-[10px] font-normal">/100</span></span>
+                      </div>
+                      <div className="text-center text-[10px] font-bold text-slate-400 px-2 bg-white/5 rounded-md self-center">VS</div>
+                      <div className="text-right">
+                        <span className="text-[9px] text-rose-300 block uppercase leading-none">{currentOpponent.name}</span>
+                        <span className="text-base font-mono font-black text-rose-455">{tournamentComputerScore} <span className="text-[10px] font-normal">/100</span></span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleRoundContinue}
+                    className="mt-6 w-full py-3 bg-teal-400 hover:bg-teal-300 text-slate-950 font-black rounded-2xl text-xs uppercase shadow-xl flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <span>Continuer la partie</span>
+                    <Icons.ArrowRight />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* General Tournament End Victory / Defeat Modal */}
+            {showTournamentEndPopup && (
+              <div className="fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 z-50">
+                <div className="bg-[#0b2b29] border-4 border-dashed border-[#2dd4bf] rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl relative overflow-hidden animate-scale-up">
+                  {tournamentWinner === 'player' ? (
+                    <div className="flex flex-col items-center">
+                      <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-yellow-405 to-teal-500 border-2 border-yellow-400/80 flex items-center justify-center mb-5 rotate-6 shadow-lg">
+                        <Icons.Trophy />
+                      </div>
+                      <div className="text-[10px] bg-teal-950 text-teal-300 border border-[#2dd4bf]/30 font-black px-3 py-1 rounded-full uppercase tracking-widest text-center">
+                        🏆 CHAMPIONNAT REMPORTÉ !
+                      </div>
+                      <h2 className="text-2xl font-black text-[#2dd4bf] mt-3 leading-none uppercase">
+                        BRAVO CHAMPION !
+                      </h2>
+                      <div className="text-[11px] font-bold text-teal-100 mt-1 uppercase tracking-wider bg-black/30 border border-[#2dd4bf]/20 px-3 py-0.5 rounded-full">
+                        <span>Vous avez terrassé {currentOpponent.name}</span>
+                      </div>
+                      <p className="text-xs text-teal-100/70 mt-4 leading-relaxed">
+                        Grâce à votre sagacité, vous avez atteint la barre ultime des 100 points avant votre rival de l'arène de {currentOpponent.country}. En route pour de nouveaux défis géographiques !
+                      </p>
+
+                      <div className="mt-5 w-full bg-black/45 p-3 rounded-xl border border-white/5 flex justify-around text-center">
+                        <div>
+                          <span className="text-[9px] text-[#2dd4bf]/70 block font-bold">Votre score final</span>
+                          <span className="font-mono text-xl font-black text-[#2dd4bf]">{tournamentPlayerScore} pts</span>
+                        </div>
+                        <div className="w-[1px] h-8 bg-white/10" />
+                        <div>
+                          <span className="text-[9px] text-rose-350 block font-bold">{currentOpponent.name}</span>
+                          <span className="font-mono text-xl font-black text-rose-400">{tournamentComputerScore} pts</span>
+                        </div>
+                      </div>
+
+                      <div className="mt-6 w-full flex flex-col gap-2">
+                        {opponentIndex < OPPONENTS.length - 1 ? (
+                          <button
+                            onClick={handleNextOpponent}
+                            className="w-full py-3.5 bg-teal-400 hover:bg-teal-300 text-slate-950 font-black rounded-2xl text-xs uppercase flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-95 transition-all"
+                          >
+                            <span>Affronter le pays suivant ({OPPONENTS[opponentIndex + 1].flag})</span>
+                            <Icons.ArrowRight />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => startNewMatch(0)}
+                            className="w-full py-3.5 bg-teal-300 hover:bg-teal-200 text-slate-950 font-black rounded-2xl text-xs uppercase flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-95 transition-all"
+                          >
+                            <Icons.RotateCcw />
+                            <span>Recommencer le Grand Tournoi !</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center">
+                      <div className="w-20 h-20 rounded-2xl bg-black/50 border-2 border-rose-500/40 flex items-center justify-center mb-5 shadow-inner">
+                        <span className="text-4xl filter grayscale">💀</span>
+                      </div>
+                      <div className="text-[10px] bg-rose-950 text-rose-400 border border-rose-500/30 font-black px-3 py-1 rounded-full uppercase tracking-widest text-center">
+                        😭 TOURNOI CLÔTURÉ
+                      </div>
+                      <h2 className="text-2xl font-black text-rose-400 mt-3 leading-none uppercase">
+                        DÉFAITE CUISANTE
+                      </h2>
+                      <p className="text-xs text-rose-100/70 mt-4 leading-relaxed">
+                        {currentOpponent.name} a atteint les 100 points ou possède une avance critique après 12 rounds d'affrontements intensifs. Relevez la tête pour retenter cette arène !
+                      </p>
+
+                      <div className="mt-5 w-full bg-black/45 p-3 rounded-xl border border-white/5 flex justify-around text-center">
+                        <div>
+                          <span className="text-[9px] text-[#2dd4bf]/70 block font-bold">Votre score final</span>
+                          <span className="font-mono text-xl font-black text-[#2dd4bf]">{tournamentPlayerScore} pts</span>
+                        </div>
+                        <div className="w-[1px] h-8 bg-white/10" />
+                        <div>
+                          <span className="text-[9px] text-rose-350 block font-bold">{currentOpponent.name}</span>
+                          <span className="font-mono text-xl font-black text-rose-400">{tournamentComputerScore} pts</span>
+                        </div>
+                      </div>
+
+                      <div className="mt-6 w-full">
+                        <button
+                          onClick={handleRetryOpponent}
+                          className="w-full py-3.5 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-2xl text-xs uppercase flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+                        >
+                          <Icons.RotateCcw />
+                          <span>Prendre ma revanche ({currentOpponent.flag})</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
